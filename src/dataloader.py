@@ -39,6 +39,7 @@ class PrDataset:
                     print('min/max: {}/{}'.format(np.min(xtrue), np.max(xtrue)))
                     self.data['xtrue'].append(xtrue)
                 elif filename.endswith(self.mat_format):
+                    print('load data from: ', os.path.join(dirpath, filename))
                     img = sio.loadmat(os.path.join(dirpath, filename))['x']
                     for j in range(img.shape[-1]):
                         res_img = cv2.resize(np.squeeze(img[:,:,j]), 
@@ -69,7 +70,7 @@ class PrDataset:
             self.data['x0'].append(x0_spectral)
             
 if __name__ == "__main__":
-    datapath = '../data/Set12'
+    datapath = '../data/coil'
     N = 128         
     scalefact = 0.02
     sigma = 1
