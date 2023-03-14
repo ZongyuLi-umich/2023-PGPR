@@ -5,6 +5,7 @@ import numpy as np
 import os
 from PIL import Image
 from utils import *
+import scipy.io as sio
 
 class PrDataset:
     def __init__(self, path, N, scalefact, sigma) -> None:
@@ -16,6 +17,7 @@ class PrDataset:
         self.L = 2 * N
         self.scalefact = scalefact
         self.img_format = ['png', 'jpg', 'jpeg', 'tiff']
+        self.mat_format = 'test.mat'
         self.load_data()
         print('# of img: ', len(self.data['xtrue']))
         self.ref = np.random.randint(2, size=(N**2,))
@@ -36,6 +38,14 @@ class PrDataset:
                     xtrue = np.array(res_img) / np.max(res_img)
                     print('min/max: {}/{}'.format(np.min(xtrue), np.max(xtrue)))
                     self.data['xtrue'].append(xtrue)
+                elif filename.endswith(self.mat_format):
+                    img = sio.loadmat(os.path.join(dirpath, filename))['x']
+                    for j in range(img.shape[-1]):
+                        res_img = cv2.resize(np.squeeze(img[:,:,j]), 
+                                             dsize=(self.N, self.N))
+                        xtrue = np.array(res_img) / np.max(res_img)
+                        print('min/max: {}/{}'.format(np.min(xtrue), np.max(xtrue)))
+                        self.data['xtrue'].append(xtrue)
                 else:
                     continue
     def gen_sys(self):

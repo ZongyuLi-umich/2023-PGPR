@@ -5,6 +5,8 @@ def configparser(path='../config/params.txt'):
      parser = configargparse.ArgumentParser(default_config_files=[path])
      parser.add_argument('--config', is_config_file=True,
                         help='config file path')
+     parser.add_argument("--expname", type=str, default='test001',
+                        help='experiment name')
      parser.add_argument("--datadir", type=str, default='../data/',
                         help='where to load training/testing data')
      parser.add_argument("--imgsize", type=int, default=128,

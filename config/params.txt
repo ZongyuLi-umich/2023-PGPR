@@ -1,6 +1,7 @@
+expname = test001
 datadir = ../data/Set12
 imgsize = 128
 scaleSYS = 0.02
 sigma = 1
 delta = 5
-regTV = 2
+regTV = 10

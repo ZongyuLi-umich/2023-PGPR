@@ -3,7 +3,13 @@
 import numpy as np
 from scipy.special import lambertw
 from numpy.linalg import norm
+import os
 
+def check_and_mkdir(path):
+    if not os.path.exists(path):
+        # os.mkdir(path)
+        os.makedirs(path)
+                    
 def abs2(x):
     return np.abs(x)**2
 
