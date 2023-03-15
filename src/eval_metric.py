@@ -1,7 +1,7 @@
 # eval_metric.py
 # evaluation metric
 import numpy as np
-from utils import vec
+from utils2 import vec
 from numpy.linalg import norm
 
 def phase_shift(x, xtrue): 

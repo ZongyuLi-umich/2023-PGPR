@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import os
 from PIL import Image
-from utils import *
+from utils2 import *
 import scipy.io as sio
 
 class PrDataset:
@@ -41,6 +41,7 @@ class PrDataset:
                 elif filename.endswith(self.mat_format):
                     print('load data from: ', os.path.join(dirpath, filename))
                     img = sio.loadmat(os.path.join(dirpath, filename))['x']
+                    img = img[:,:,:2]
                     for j in range(img.shape[-1]):
                         res_img = cv2.resize(np.squeeze(img[:,:,j]), 
                                              dsize=(self.N, self.N))

@@ -9,6 +9,8 @@ def configparser(path='../config/params.txt'):
                         help='experiment name')
      parser.add_argument("--datadir", type=str, default='../data/',
                         help='where to load training/testing data')
+     parser.add_argument("--scoredir", type=str, default='../data/',
+                        help='where to load score function checkpoint')
      parser.add_argument("--imgsize", type=int, default=128,
                         help='image size')
      parser.add_argument("--scaleSYS", type=float, default=0.02,

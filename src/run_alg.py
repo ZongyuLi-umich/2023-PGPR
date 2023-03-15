@@ -2,9 +2,10 @@
 # return selected algorithm
 from Wirtinger_flow_huber_TV import *
 from Wirtinger_flow_pois_gau import *
+from Wirtinger_flow_score import *
 from pnp_pgadmm import *
 
-def run_alg(alg, sigma, delta, niter, reg1, reg2, **kwargs):
+def run_alg(alg, sigma, delta, niter, reg1=0, reg2=0, model=None, **kwargs):
     if alg == 'gau':
         xout, cout = Wintinger_flow_huber_TV(A=kwargs['A'], 
                                        At=kwargs['At'], 
@@ -60,7 +61,17 @@ def run_alg(alg, sigma, delta, niter, reg1, reg2, **kwargs):
                                        reg2=reg2, 
                                        xtrue=kwargs['xtrue'])
     elif alg == 'pg_score':
-        return NotImplementedError
+        xout, cout = Wintinger_flow_score(A=kwargs['A'], 
+                                       At=kwargs['At'], 
+                                       y=kwargs['y'], 
+                                       b=kwargs['b'], 
+                                       x0=kwargs['x0'], 
+                                       ref=kwargs['ref'], 
+                                       sigma=sigma, 
+                                       delta=delta, 
+                                       niter=niter, 
+                                       xtrue=kwargs['xtrue'], 
+                                       model = model)
     else:
         return NotImplementedError
     return xout, cout
