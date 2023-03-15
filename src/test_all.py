@@ -1,13 +1,14 @@
-# test_nonDL.py
+# test_all.py
 from utils2 import *
 import numpy as np
 from config_parser import *
 from run_alg import *
 from dataloader import *
 import sys
-sys.path.insert(0, '/n/newberry/v/jashu/scoreMatchingFull/src')
+# sys.path.insert(0, '/n/newberry/v/jashu/scoreMatchingFull/src')
 from model2 import Unet
 from utils import *
+import scipy.io as sio
 
 def main(parampath = '../config/params.txt'):
     parser = configparser(path=parampath)
@@ -89,8 +90,8 @@ def main(parampath = '../config/params.txt'):
     
     results_dir = os.path.join('../result', args.expname)
     check_and_mkdir(results_dir)
-    np.save(os.path.join(results_dir, 'xtrue-x0-ynoisy.npy'), dataset.data)
-    np.save(os.path.join(results_dir, 'alg-results.npy'), all_results)
+    sio.savemat(os.path.join(results_dir, 'xtrue-x0-ynoisy.mat'), dataset.data)
+    sio.savemat(os.path.join(results_dir, 'alg-results.mat'), all_results)
     
     
         

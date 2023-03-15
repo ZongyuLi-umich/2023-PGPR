@@ -35,7 +35,7 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, rho, prox, uiter, xtru
             grad_u = 2 * np.real(At(np.multiply(grad_phi(abs2(Au)+b, y, sigma, delta), Au)))[:N] \
                         + rho * (u - x - eta) 
                     
-            mu_u_hat = backtracking(1.0, u, cost_fun_u, grad_u, lowerbound=0) # assume u is non-negative
+            mu_u_hat = 0.001 # assume u is non-negative
         
             u = np.maximum(0, u - mu_u_hat * grad_u)
             # update Au

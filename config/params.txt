@@ -1,5 +1,6 @@
-expname = test001
-datadir = ../data/Set12
+expname = test-purple
+datadir = ../data/purple
+scoredir = ../scoremodels/purple/best_checkpoint.pytorch
 imgsize = 128
 scaleSYS = 0.02
 sigma = 1
