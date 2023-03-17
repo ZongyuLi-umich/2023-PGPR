@@ -18,7 +18,7 @@ def get_grad(sigma, delta):
     return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
         
 def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta, 
-                            niter, xtrue, model):
+                            niter, xtrue, model, verbose=True):
     M = len(y)
     N = len(x0)
     out = []
@@ -32,7 +32,7 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
     lastnrmse = 1
     T = 3
     sigmas = np.geomspace(0.03, 0.005, niter)
-    for iter in tqdm(range(niter)):
+    for iter in range(niter):
         lsize = 128
         for t in range(T):
             netinput = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().cuda()
@@ -51,8 +51,9 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             Ax = A(holocat(x, ref))
 
         out.append(nrmse(x, xtrue))
-        print('nrmse: ', out[-1])
         if lastnrmse-out[-1] < 0.0001:
             break
         lastnrmse = out[-1]
+        if verbose: 
+            print(f'iter: {iter:03d} / {niter:03d} || nrmse (out, xtrue): {out[-1]:.4f}')
     return x, out

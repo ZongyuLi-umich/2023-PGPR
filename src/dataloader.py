@@ -41,7 +41,7 @@ class PrDataset:
                 elif filename.endswith(self.mat_format):
                     print('load data from: ', os.path.join(dirpath, filename))
                     img = sio.loadmat(os.path.join(dirpath, filename))['x']
-                    img = img[:,:,:2]
+                    img = img[:,:,:]
                     for j in range(img.shape[-1]):
                         res_img = cv2.resize(np.squeeze(img[:,:,j]), 
                                              dsize=(self.N, self.N))

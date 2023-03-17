@@ -417,6 +417,53 @@ class Unet(nn.Module):
         x = self.final_res_block(x, t)
         #print(self.final_conv(x).shape) 8 1 16 16
         return torch.squeeze(self.final_conv(x))
+    
+class DnCNN(nn.Module):
+    def __init__(self, net_config):
+        super(DnCNN, self).__init__()
+        self.name = 'dncnn' 
+        dimension = net_config['dimension']
+        ic = net_config['ic']
+        oc = net_config['oc']
+        depth = net_config['depth']
+        features = net_config['features']
+        kernel_size = net_config['kernel_size']
+        groups = net_config['groups']
+        is_bn = net_config['is_bn']
+        is_sn = net_config['is_sn']
+        is_res = net_config['is_res']
+        padding = (kernel_size - 1) // 2
+        
+        # for inference
+        self.dimension = dimension
+        self.is_res = is_res
+                
+        if dimension < 3:
+            if is_sn: conv_fn = lambda in_channels, out_channels, kernel_size, padding, bias, groups: SpectralNorm(nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, padding=padding, bias=bias, groups=groups))
+            else:     conv_fn = nn.Conv2d
+            bn_fn   = nn.BatchNorm2d
+        elif dimension == 3:
+            if is_sn: conv_fn = lambda in_channels, out_channels, kernel_size, padding, bias, groups: SpectralNorm(nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, padding=padding, bias=bias, groups=groups))
+            else:     conv_fn = nn.Conv3d
+            bn_fn   = nn.BatchNorm3d
+
+        layers = []
+        layers.append(conv_fn(in_channels=ic, out_channels=features, kernel_size=kernel_size, padding=padding, bias=True, groups=groups))
+        layers.append(nn.ReLU(inplace=True))
+        
+        for _ in range(depth-2):
+            layers.append(conv_fn(in_channels=features, out_channels=features, kernel_size=kernel_size, padding=padding, bias=False, groups=groups))
+            if is_bn: layers.append(bn_fn(features))
+            layers.append(nn.ReLU(inplace=True))
+            
+        layers.append(conv_fn(in_channels=features, out_channels=oc, kernel_size=kernel_size, padding=padding, bias=False, groups=groups))
+        self.dnn = nn.Sequential(*layers)        
+
+    def forward(self, x):
+        out = self.dnn(x)
+        if self.is_res:
+            out = x - out
+        return out
 
 if __name__ == "__main__":
     model = Unet(dim = 64)

@@ -18,7 +18,7 @@ def get_grad(gradhow):
         raise NotImplementedError
     return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
         
-def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, reg2, xtrue):
+def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, reg2, xtrue, verbose = True):
     M = len(y)
     N = len(x0)
     out = []
@@ -32,7 +32,7 @@ def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, r
     Ax = A(holocat(x, ref))
     Tx = diff2d_forw(x, sn, sn)
     def cost_fun(Ax, Tx): return np.sum(phi(Ax, y, b)) + reg1 * np.sum(huber_v(Tx, reg2))
-    for iter in tqdm(range(niter)):
+    for iter in range(niter):
         grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + reg1 * diff2d_adj(grad_huber_v(Tx, reg2), sn, sn)
         Adk = A(holocat(grad_f, np.zeros_like(grad_f))) # K*L
         Tdk = diff2d_forw(grad_f, sn, sn)
@@ -65,5 +65,7 @@ def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, r
         Ax = A(holocat(x, ref))
         Tx = diff2d_forw(x, sn, sn)
         out.append(nrmse(x, xtrue))
+        if verbose: 
+            print(f'iter: {iter:03d} / {niter:03d} || nrmse (out, xtrue): {out[-1]:.4f}')
     return x, out
 

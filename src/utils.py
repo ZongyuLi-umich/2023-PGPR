@@ -7,6 +7,24 @@ import torch
 import shutil
 import random
 
+###############################################################################
+# Init envs
+###############################################################################
+
+def init_env(seed_value=0):
+    os.environ['PYTHONHASHSEED']=str(seed_value)
+    random.seed(seed_value)
+    torch.manual_seed(seed_value)
+    np.random.seed(seed_value)
+    
+from scipy.optimize import fminbound
+def optimizeTau(x, algoHandle, taurange, maxfun=20):
+    evaluateSNR = lambda x, xhat: 20 * np.log10(
+        np.linalg.norm(x.flatten('F')) / np.linalg.norm(x.flatten('F') - xhat.flatten('F')))
+    fun = lambda tau: -evaluateSNR(x, algoHandle(tau)[0])
+    tau = fminbound(fun, taurange[0], taurange[1], xtol=1e-3, maxfun=maxfun, disp=3)
+    return tau
+
 def getPatch(image, row, col, psize):
     #print(image.size())
     B = image.size(dim=0)
@@ -91,7 +109,7 @@ def config_parser():
 
     parser.add_argument("--srcdir", type=str, default='../src/',
                         help='where the code is')
-
+    
     return parser
 
 def count_parameters(model):
@@ -166,6 +184,8 @@ def snr2(signal, noisy_signal):
         snr = (np.log10(var_signal/var_noise))*10       ## SNR of the data
     return snr
     
+
+
 if __name__ == "__main__":
     parser = config_parser()
     args = parser.parse_args()

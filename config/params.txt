@@ -1,8 +1,10 @@
-expname = test-purple
-datadir = ../data/purple
-scoredir = ../scoremodels/purple/best_checkpoint.pytorch
+savedir = /s5/xjxu/exps/pgpr/nature
+datadir = /n/newberry/v/jashu/scoreMatchingFull/data/nature
+scoredir = 
 imgsize = 128
 scaleSYS = 0.02
 sigma = 1
 delta = 5
 regTV = 10
+
+Nimgs = 1
