@@ -60,11 +60,11 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
                   }
         
         if 'gau' in  exp_to_do:
-            transcript.start(exp_dir + '/logfile.log', mode='a')
             alg_name = 'gau'
             exp_dir = f'{results_dir}/{alg_name}'
             check_and_mkdir(exp_dir)
             exp_path = f'{exp_dir}/result.mat'
+            transcript.start(exp_dir + '/logfile.log', mode='a')
             print('\n###########################################################')
             print(f'{alg_name}')
             print('###########################################################')
@@ -88,11 +88,11 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
                 
 
         if 'pois' in  exp_to_do:  
-            transcript.start(exp_dir + '/logfile.log', mode='a')
             alg_name = 'pois'
             exp_dir = f'{results_dir}/{alg_name}'
             check_and_mkdir(exp_dir)
             exp_path = f'{exp_dir}/result.mat'
+            transcript.start(exp_dir + '/logfile.log', mode='a')
             print('\n###########################################################')
             print(f'{alg_name}')
             print('###########################################################')
@@ -106,7 +106,7 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=0, 
                                     delta=0, 
-                                    niter=50, 
+                                    niter=200, 
                                     **kwargs)
                 result = {'xout': xout, 'cout': cout}
                 sio.savemat(f'{exp_path}', result)
@@ -115,12 +115,12 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             xout_pois = xout
             
         if 'pg' in  exp_to_do: 
-            transcript.start(exp_dir + '/logfile.log', mode='a')
             alg_name = 'pg'
             exp_dir = f'{results_dir}/{alg_name}'
             check_and_mkdir(exp_dir)
             exp_path = f'{exp_dir}/result.mat'
             
+            transcript.start(exp_dir + '/logfile.log', mode='a')
             print('\n###########################################################')
             print(f'{alg_name}')
             print('###########################################################')
@@ -146,11 +146,12 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             transcript.stop()
             
         if 'pg_tv' in  exp_to_do: 
-            transcript.start(exp_dir + '/logfile.log', mode='a')
             alg_name = 'pg_tv' 
             exp_dir = f'{results_dir}/{alg_name}'
             check_and_mkdir(exp_dir)
             exp_path = f'{exp_dir}/result.mat'
+            
+            transcript.start(exp_dir + '/logfile.log', mode='a')
             print('\n###########################################################')
             print(f'{alg_name}')
             print('###########################################################')
@@ -178,8 +179,7 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             transcript.stop()
             
         
-        if 'pnp_pgadmm' in  exp_to_do:
-            transcript.start(exp_dir + '/logfile.log', mode='a') 
+        if 'pnp_pgadmm' in  exp_to_do: 
             # hyper parameters
             rho = 1
             scale = 1
@@ -190,7 +190,8 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             exp_dir = f'{results_dir}/{alg_name}_sgm{sgm}_scale{scale}_rho{rho}'
             check_and_mkdir(exp_dir)
             exp_path = f'{exp_dir}/result.mat'
-
+            
+            transcript.start(exp_dir + '/logfile.log', mode='a')
             print('\n###########################################################')
             print(f'{alg_name}')
             print('###########################################################')
@@ -246,12 +247,12 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             
         
         if 'pg_score' in  exp_to_do: 
-            transcript.start(exp_dir + '/logfile.log', mode='a')
             alg_name = 'pg_score'    
             exp_dir = f'{results_dir}/{alg_name}'
             check_and_mkdir(exp_dir)
             exp_path = f'{exp_dir}/result.mat'
-
+            
+            transcript.start(exp_dir + '/logfile.log', mode='a')
             print('\n###########################################################')
             print(f'{alg_name}')
             print('###########################################################')
