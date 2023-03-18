@@ -8,15 +8,27 @@ import shutil
 import random
 
 ###############################################################################
-# Init envs
+# (Xiaojian's start)
 ###############################################################################
+def check_and_mkdir(path):
+    if not os.path.exists(path):
+        # os.mkdir(path)
+        os.makedirs(path)
 
-def init_env(seed_value=0):
+def init_env(seed_value=42):
     os.environ['PYTHONHASHSEED']=str(seed_value)
     random.seed(seed_value)
     torch.manual_seed(seed_value)
     np.random.seed(seed_value)
-    
+
+def copytree_code(src_path, save_path):
+    max_code_save = 100
+    for i in range(max_code_save):
+        code_path = save_path + 'code%d/' % i
+        if not os.path.exists(code_path):
+            shutil.copytree(src=src_path, dst=code_path)
+            break
+  
 from scipy.optimize import fminbound
 def optimizeTau(x, algoHandle, taurange, maxfun=20):
     evaluateSNR = lambda x, xhat: 20 * np.log10(
@@ -24,6 +36,9 @@ def optimizeTau(x, algoHandle, taurange, maxfun=20):
     fun = lambda tau: -evaluateSNR(x, algoHandle(tau)[0])
     tau = fminbound(fun, taurange[0], taurange[1], xtol=1e-3, maxfun=maxfun, disp=3)
     return tau
+###############################################################################
+# (Xiaojian's end)
+###############################################################################
 
 def getPatch(image, row, col, psize):
     #print(image.size())
@@ -142,24 +157,7 @@ def save_checkpoint(state, is_best, checkpoint_dir, logger=None):
         log_info(f"Saving best checkpoint to '{best_file_path}'")
         shutil.copyfile(last_file_path, best_file_path)
 
-def check_and_mkdir(path):
-    if not os.path.exists(path):
-        # os.mkdir(path)
-        os.makedirs(path)
 
-def init_env(seed_value=42):
-    os.environ['PYTHONHASHSEED']=str(seed_value)
-    random.seed(seed_value)
-    torch.manual_seed(seed_value)
-    np.random.seed(seed_value)
-
-def copytree_code(src_path, save_path):
-    max_code_save = 100
-    for i in range(max_code_save):
-        code_path = save_path + 'code%d/' % i
-        if not os.path.exists(code_path):
-            shutil.copytree(src=src_path, dst=code_path)
-            break
 def snr(x, xhat):
     return 20 * np.log10(np.linalg.norm(x.flatten()) / np.linalg.norm(xhat.flatten()-x.flatten()))
 

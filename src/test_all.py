@@ -12,6 +12,7 @@ from model2 import Unet
 from utils import *
 import scipy.io as sio
 import transcript
+import os, time, datetime
 
 def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
     parser = configparser(path=parampath)
@@ -181,14 +182,16 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
         
         if 'pnp_pgadmm' in  exp_to_do: 
             # hyper parameters
-            rho = 5
+            rho = 1
             scale = 1
             opt_pnppgadmm_scale = False
             opt_pnppgadmm_rho = False
+            desp  = 'uiter5'
             
             alg_name = 'pnp_pgadmm'
-            exp_dir = f'{results_dir}/{alg_name}_sgm{sgm}_scale{scale}_rho{rho}'
+            exp_dir = f'{results_dir}/{alg_name}_sgm{sgm}_scale{scale}_rho{rho}_{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
+            copytree_code('/n/higgins/z/xjxu/projects/2023-PGPR/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
             
             transcript.start(exp_dir + '/logfile.log', mode='a')

@@ -74,7 +74,7 @@ def run_alg(alg, sigma, delta, niter, reg1=0, reg2=0, model=None, scale = 1, ver
                                 delta=delta, 
                                 niter=niter, 
                                 rho = rho,
-                                uiter= 10, 
+                                uiter= 5, 
                                 mu_u = -0.001,
                                 xtrue=kwargs['xtrue'], 
                                 model = model,
