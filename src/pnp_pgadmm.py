@@ -21,7 +21,7 @@ def get_grad(sigma, delta):
     return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
 
 
-def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, rho, uiter, xtrue, model, verbose=True):
+def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, rho, uiter, mu_u, xtrue, model, verbose=True):
     N = len(x0)
     sn = np.sqrt(N).astype(int)
     out = []
@@ -38,9 +38,7 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, rho, uiter, xtrue, mod
             grad_u = np.real(At(grad_phi(Au, y, b)))[:N] + rho * (u - x - eta) 
             # Adk = A(holocat(grad_u, np.zeros_like(grad_u)))
             # D1 = np.sqrt(fisher(Au, b))
-            #mu_u = - (norm(grad_u)**2)/ (norm(np.multiply(Adk, D1))**2)
-            
-            mu_u =  -0.001  
+            #mu_u = - (norm(grad_u)**2)/ (norm(np.multiply(Adk, D1))**2) 
             u = np.maximum(0, u + mu_u * grad_u)
             # update Au
             Au = A(holocat(u, ref))
@@ -53,6 +51,7 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, rho, uiter, xtrue, mod
         vec_img = torch.from_numpy(jreshape(vec_tmp, sn, sn))[None, None, ...].to(torch.float32).cuda()
         dx = model(vec_img)
         dx[dx < 0]  = 0
+        dx[dx > 1]  = 1
         x = vec(dx.cpu().numpy())
         ##########################################
         # update eta

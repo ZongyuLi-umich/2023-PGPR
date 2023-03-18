@@ -181,7 +181,7 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
         
         if 'pnp_pgadmm' in  exp_to_do: 
             alg_name = 'pnp_pgadmm'
-            exp_dir = f'{results_dir}/{alg_name}'
+            exp_dir = f'{results_dir}/{alg_name}_sgm{sgm}'
             check_and_mkdir(exp_dir)
             exp_path = f'{exp_dir}/result.mat'
             
@@ -192,17 +192,19 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             
             kwargs['x0'] = xout_pois
             print(f'[Old]: re-init x0 from result_pois.')
+            
+            # hyper parameters
+            rho = 5
+            scale = 1
+            opt_pnppgadmm_scale = False
+            opt_pnppgadmm_rho = False
+            
             try: 
                 result = sio.loadmat(exp_path)
                 xout = result['xout'].squeeze()
                 cout  = result['cout'].squeeze()
                 print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
             except:
-                rho = 5
-                scale = 1
-                opt_pnppgadmm_scale = False
-                opt_pnppgadmm_rho = False
-                
                 if opt_pnppgadmm_scale:
                     algoHandle = lambda scale: run_alg(alg=alg_name, 
                                                     sigma=args.sigma, 
@@ -215,9 +217,8 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
                                                     **kwargs)
                     
                     scale = optimizeTau(kwargs['xtrue'], algoHandle, [0, 2], maxfun=10)
-                    print(f'opt scale = {scale}')
-                
-                
+                print(f'opt scale = {scale}')
+
                 if opt_pnppgadmm_rho:
                     algoHandle = lambda rho: run_alg(alg=alg_name, 
                                                     sigma=args.sigma, 
@@ -230,10 +231,8 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
                                                     **kwargs)
                     
                     rho = optimizeTau(kwargs['xtrue'], algoHandle, [0, 10], maxfun=10)
-                    print(f'opt rho = {rho}')
-                    
-
-                    
+                print(f'opt rho = {rho}')
+                                        
                 print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
@@ -328,7 +327,7 @@ if __name__ == "__main__":
         dnn.load_state_dict(new_state_dict,strict=True)
     except: 
         print("Model cannnot load")
-    
+
     ############################################################
     # run
     ############################################################
