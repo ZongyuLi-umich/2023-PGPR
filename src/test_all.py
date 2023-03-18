@@ -39,7 +39,7 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
         print('###########################################################')
         init_path = f'{exp_dir}/result.mat'
         try: 
-            init_data = sio.load(init_path)
+            init_data = sio.loadmat(init_path)
             print(f'[Old]: init data  loaded from {init_path}.')
         except:
             print(f'[New]: init data  running to {init_path}.')
@@ -180,8 +180,14 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             
         
         if 'pnp_pgadmm' in  exp_to_do: 
+            # hyper parameters
+            rho = 10
+            scale = 1
+            opt_pnppgadmm_scale = False
+            opt_pnppgadmm_rho = False
+            
             alg_name = 'pnp_pgadmm'
-            exp_dir = f'{results_dir}/{alg_name}_sgm{sgm}'
+            exp_dir = f'{results_dir}/{alg_name}_sgm{sgm}_scale{scale}_rho{rho}'
             check_and_mkdir(exp_dir)
             exp_path = f'{exp_dir}/result.mat'
             
@@ -193,12 +199,6 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             kwargs['x0'] = xout_pois
             print(f'[Old]: re-init x0 from result_pois.')
             
-            # hyper parameters
-            rho = 5
-            scale = 1
-            opt_pnppgadmm_scale = False
-            opt_pnppgadmm_rho = False
-            
             try: 
                 result = sio.loadmat(exp_path)
                 xout = result['xout'].squeeze()
@@ -209,7 +209,7 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
                     algoHandle = lambda scale: run_alg(alg=alg_name, 
                                                     sigma=args.sigma, 
                                                     delta=args.delta, 
-                                                    niter=50, 
+                                                    niter=10, 
                                                     model=model,
                                                     scale = scale,
                                                     rho = rho,
@@ -223,7 +223,7 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
                     algoHandle = lambda rho: run_alg(alg=alg_name, 
                                                     sigma=args.sigma, 
                                                     delta=args.delta, 
-                                                    niter=50, 
+                                                    niter=10, 
                                                     model=model,
                                                     scale = scale,
                                                     rho = rho,
@@ -237,7 +237,7 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=50, 
+                                    niter=10, 
                                     model=model, 
                                     **kwargs)
                 result = {'xout': xout, 'cout': cout}

@@ -6,11 +6,12 @@
     "methods": {
         "denoise": {
             "dnn_name": "dncnn",
-            "sgm":1,
+            "sgm":15,
             "model_path": {
                 "sgm_0.5": "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm0.5/2023-03-17-03-36-47/train/models/best_snr.pth",
                 "sgm_1":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm1/2023-03-17-03-38-27/train/models/best_snr.pth",
-                "sgm_3":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm3/2023-03-17-03-39-22/train/models/best_snr.pth"
+                "sgm_3":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm3/2023-03-17-03-39-22/train/models/best_snr.pth",
+                "sgm_15":  "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm15/2023-03-17-03-22-30/train/models/best_snr.pth"
             }
         }     
     },
