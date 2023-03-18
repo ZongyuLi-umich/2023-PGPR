@@ -47,11 +47,10 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, rho, uiter, mu_u, xtru
         ##########################################
         # Implement plug and play      
         vec_tmp = u - eta
-        vec_tmp[vec_tmp<=0] = 0
+        vec_tmp = np.clip(vec_tmp, 0, 1)
         vec_img = torch.from_numpy(jreshape(vec_tmp, sn, sn))[None, None, ...].to(torch.float32).cuda()
         dx = model(vec_img)
-        dx[dx < 0]  = 0
-        dx[dx > 1]  = 1
+        dx = np.clip(dx, 0, 1)
         x = vec(dx.cpu().numpy())
         ##########################################
         # update eta

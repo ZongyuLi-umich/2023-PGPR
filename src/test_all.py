@@ -14,7 +14,7 @@ import scipy.io as sio
 import transcript
 import os, time, datetime
 
-def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
+def main(parampath = '../config/params.txt', model = None, exp_to_do = [], project_root=''):
     parser = configparser(path=parampath)
     args = parser.parse_args()
     print('config args: ', args)
@@ -182,16 +182,16 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
         
         if 'pnp_pgadmm' in  exp_to_do: 
             # hyper parameters
-            rho = 1
+            rho = 5
             scale = 1
             opt_pnppgadmm_scale = False
             opt_pnppgadmm_rho = False
-            desp  = 'uiter5'
+            desp  = '_uiter5_mu0.0001'
             
             alg_name = 'pnp_pgadmm'
             exp_dir = f'{results_dir}/{alg_name}/sgm{sgm}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
-            copytree_code('/n/higgins/z/xjxu/projects/2023-PGPR/src', exp_dir + '/')
+            copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
             
             transcript.start(exp_dir + '/logfile.log', mode='a')
@@ -288,6 +288,7 @@ if __name__ == "__main__":
     from model2 import DnCNN
     from collections import OrderedDict
     exp_to_do = ['pois', 'pnp_pgadmm'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm']
+    project_root = '/n/higgins/z/xjxu/projects/2023-PGPR'
     
     ##################################################
     # Reproducibility
@@ -302,7 +303,7 @@ if __name__ == "__main__":
     ##################################################
     # load config
     ##################################################
-    with open('/n/higgins/z/xjxu/projects/2023-PGPR/config/pnp_config.json') as File:
+    with open(f'{project_root}/src/config/pnp_config.json') as File:
         config = json.load(File)
         
     ##################################################
@@ -337,4 +338,4 @@ if __name__ == "__main__":
     # run
     ############################################################
     with torch.no_grad():
-        main(parampath = '/config/params.txt', model = dnn, exp_to_do = exp_to_do)
+        main(parampath = './config/params.txt', model = dnn, exp_to_do = exp_to_do, project_root=project_root)
