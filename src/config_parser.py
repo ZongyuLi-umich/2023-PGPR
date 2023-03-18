@@ -1,7 +1,7 @@
 # config_parser.py
 import configargparse
 
-def configparser(path='../config/params.txt'):
+def configparser(path='./config/params.txt'):
      parser = configargparse.ArgumentParser(default_config_files=[path])
      parser.add_argument('--config', is_config_file=True,
                         help='config file path')

@@ -14,7 +14,7 @@ import scipy.io as sio
 import transcript
 import os, time, datetime
 
-def main(parampath = '../config/params.txt', model = None, exp_to_do = [], project_root=''):
+def main(parampath = './config/params.txt', model = None, exp_to_do = [], project_root=''):
     parser = configparser(path=parampath)
     args = parser.parse_args()
     print('config args: ', args)
