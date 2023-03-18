@@ -189,7 +189,7 @@ def main(parampath = '../config/params.txt', model = None, exp_to_do = []):
             desp  = 'uiter5'
             
             alg_name = 'pnp_pgadmm'
-            exp_dir = f'{results_dir}/{alg_name}_sgm{sgm}_scale{scale}_rho{rho}_{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}/sgm{sgm}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
             copytree_code('/n/higgins/z/xjxu/projects/2023-PGPR/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
