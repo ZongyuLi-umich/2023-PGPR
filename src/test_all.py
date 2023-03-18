@@ -337,4 +337,4 @@ if __name__ == "__main__":
     # run
     ############################################################
     with torch.no_grad():
-        main(parampath = '../config/params.txt', model = dnn, exp_to_do = exp_to_do)
+        main(parampath = '/config/params.txt', model = dnn, exp_to_do = exp_to_do)
