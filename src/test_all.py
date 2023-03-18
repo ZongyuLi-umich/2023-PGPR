@@ -182,7 +182,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], projec
         
         if 'pnp_pgadmm' in  exp_to_do: 
             # hyper parameters
-            rho = 1
+            rho = 5
             scale = 1
             opt_pnppgadmm_scale = False
             opt_pnppgadmm_rho = False
