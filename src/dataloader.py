@@ -60,8 +60,7 @@ class PrDataset:
             y = abs2(A(xtrue_cated)) + self.b
             y_pos = np.random.poisson(y)
             y_pos_gau = y_pos + np.random.normal(0, self.sigma**2, len(y_pos))
-            print('average count: ', np.mean(y_pos_gau))
-            print('maximum count: ', np.max(y_pos_gau))
+            print(f'average count: {np.mean(y_pos_gau)} || maximum count: {np.max(y_pos_gau)}')
             self.data['ynoisy'].append(y_pos_gau)
             x0_rand = holocat(vec(np.random.randn(self.N**2)), self.ref)
             def power_func(x): return At(np.multiply(np.divide(y_pos_gau, y_pos_gau+1), A(x)))

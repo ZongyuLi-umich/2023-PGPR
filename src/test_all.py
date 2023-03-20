@@ -14,7 +14,7 @@ import scipy.io as sio
 import transcript
 import os, time, datetime
 
-def main(parampath = './config/params.txt', model = None, exp_to_do = [], project_root=''):
+def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to_do=[], project_root=''):
     parser = configparser(path=parampath)
     args = parser.parse_args()
     print('config args: ', args)
@@ -24,7 +24,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], projec
                         scalefact=args.scaleSYS, 
                         sigma=args.sigma)
     
-    for i in range(min(args.Nimgs, len(dataset.data['xtrue']))):
+    for i in img_to_do:
         
         #  make folders
         results_dir = f'{args.savedir}_imgsize{args.imgsize}_sf{args.scaleSYS}_sigma{args.sigma}/{i}'
@@ -182,11 +182,11 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], projec
         
         if 'pnp_pgadmm' in  exp_to_do: 
             # hyper parameters
-            rho = 5
+            rho = 32
             scale = 1
             opt_pnppgadmm_scale = False
             opt_pnppgadmm_rho = False
-            desp  = '_uiter5_mu0.0001'
+            desp  = '_uiter3_muF'
             
             alg_name = 'pnp_pgadmm'
             exp_dir = f'{results_dir}/{alg_name}/sgm{sgm}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
@@ -240,7 +240,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], projec
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=10, 
+                                    niter=20, 
                                     model=model, 
                                     scale = scale,
                                     rho = rho,
@@ -250,7 +250,119 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], projec
             print(f'nrmse of {alg_name}: ', cout[-1])
             transcript.stop()
             
-        
+        if 'pnp_pgprox' in  exp_to_do: 
+            # hyper parameters
+            scale = 0.5
+            opt_pnppgprox_scale = False
+            desp  = ''
+            
+            alg_name = 'pnp_pgprox'
+            exp_dir = f'{results_dir}/{alg_name}/sgm{sgm}_scale{scale}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            check_and_mkdir(exp_dir)
+            copytree_code(f'{project_root}/src', exp_dir + '/')
+            exp_path = f'{exp_dir}/result.mat'
+            
+            transcript.start(exp_dir + '/logfile.log', mode='a')
+            print('\n###########################################################')
+            print(f'{alg_name}')
+            print('###########################################################')
+            
+            kwargs['x0'] = xout_pois
+            print(f'[Old]: re-init x0 from result_pois.')
+            try: 
+                result = sio.loadmat(exp_path)
+                xout = result['xout'].squeeze()
+                cout  = result['cout'].squeeze()
+                print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
+            except:
+                if opt_pnppgprox_scale:
+                    algoHandle = lambda scale: run_alg(alg=alg_name, 
+                                                    sigma=args.sigma, 
+                                                    delta=args.delta, 
+                                                    niter=20, 
+                                                    model=model,
+                                                    scale = scale,
+                                                    verbose = False,
+                                                    **kwargs)
+                    
+                    scale = optimizeTau(kwargs['xtrue'], algoHandle, [0, 2], maxfun=10)
+                print(f'opt scale = {scale}')
+                
+                ############################################
+                # run
+                ############################################
+                print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
+                xout, cout = run_alg(alg=alg_name, 
+                                    sigma=args.sigma, 
+                                    delta=args.delta, 
+                                    niter=20, 
+                                    model=model, 
+                                    scale = scale,
+                                    **kwargs)
+
+                result = {'xout': xout, 'cout': cout}
+                sio.savemat(f'{exp_path}', result)
+            print(f'nrmse of {alg_name}: ', cout[-1])
+            transcript.stop()
+            
+        if 'pnp_pgred' in  exp_to_do: 
+            # hyper parameters
+            scale = 0.5
+            rho   = 50
+            opt_pnppgred_scale = False
+            desp  = ''
+            
+            alg_name = 'pnp_pgred'
+            exp_dir = f'{results_dir}/{alg_name}/sgm{sgm}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            check_and_mkdir(exp_dir)
+            copytree_code(f'{project_root}/src', exp_dir + '/')
+            exp_path = f'{exp_dir}/result.mat'
+            
+            transcript.start(exp_dir + '/logfile.log', mode='a')
+            print('\n###########################################################')
+            print(f'{alg_name}')
+            print('###########################################################')
+            
+            kwargs['x0'] = xout_pois
+            print(f'[Old]: re-init x0 from result_pois.')
+            try: 
+                result = sio.loadmat(exp_path)
+                xout = result['xout'].squeeze()
+                cout  = result['cout'].squeeze()
+                print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
+            except:
+                if opt_pnppgred_scale:
+                    algoHandle = lambda scale: run_alg(alg=alg_name, 
+                                                    sigma=args.sigma, 
+                                                    delta=args.delta, 
+                                                    niter=20, 
+                                                    model=model,
+                                                    scale = scale,
+                                                    rho = rho,
+                                                    verbose = False,
+                                                    **kwargs)
+                    
+                    scale = optimizeTau(kwargs['xtrue'], algoHandle, [0, 2], maxfun=10)
+                print(f'opt scale = {scale}')
+                
+                ############################################
+                # run
+                ############################################
+                print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
+                xout, cout = run_alg(alg=alg_name, 
+                                    sigma=args.sigma, 
+                                    delta=args.delta, 
+                                    niter=20, 
+                                    model=model, 
+                                    scale = scale,
+                                    rho = rho,
+                                    **kwargs)
+
+                result = {'xout': xout, 'cout': cout}
+                sio.savemat(f'{exp_path}', result)
+            print(f'nrmse of {alg_name}: ', cout[-1])
+            transcript.stop()
+            
         if 'pg_score' in  exp_to_do: 
             alg_name = 'pg_score'    
             exp_dir = f'{results_dir}/{alg_name}'
@@ -287,8 +399,16 @@ if __name__ == "__main__":
     import json
     from model2 import DnCNN
     from collections import OrderedDict
-    exp_to_do = ['pois', 'pnp_pgadmm'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm']
+    
+    ##################################################
+    # Settings 
+    ##################################################
+    img_to_do = [0]
+    exp_to_do = ['pois', 'pnp_pgred'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm']
+    dataset_name  = 'natureimg'
     project_root = '/n/higgins/z/xjxu/projects/2023-PGPR'
+    params_config  = f'{project_root}//src/config/params_{dataset_name}.txt'
+    pnp_config = f'{project_root}/src/config/pnp_config.json'
     
     ##################################################
     # Reproducibility
@@ -303,7 +423,7 @@ if __name__ == "__main__":
     ##################################################
     # load config
     ##################################################
-    with open(f'{project_root}/src/config/pnp_config.json') as File:
+    with open(pnp_config) as File:
         config = json.load(File)
         
     ##################################################
@@ -338,4 +458,4 @@ if __name__ == "__main__":
     # run
     ############################################################
     with torch.no_grad():
-        main(parampath = './config/params.txt', model = dnn, exp_to_do = exp_to_do, project_root=project_root)
+        main(parampath = params_config, model = dnn, exp_to_do = exp_to_do, img_to_do=img_to_do, project_root=project_root)

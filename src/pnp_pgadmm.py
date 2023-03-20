@@ -21,7 +21,11 @@ def get_grad(sigma, delta):
     return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
 
 
-def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, rho, uiter, mu_u, xtrue, model, verbose=True):
+def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, rho, uiter, mu=None, scale = 1, verbose=True ):
+    
+    # xiaojian
+    # x0 = denoise(x0, model, scale, sn=128)
+    
     N = len(x0)
     sn = np.sqrt(N).astype(int)
     out = []
@@ -31,33 +35,43 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, rho, uiter, mu_u, xtru
     Au = A(holocat(u, ref))
     eta = np.zeros(N)
     _, grad_phi, fisher = get_grad(sigma, delta)
-    
+
     for iter in range(niter):
+        
         # update u
         for _ in range(uiter):
+            
             grad_u = np.real(At(grad_phi(Au, y, b)))[:N] + rho * (u - x - eta) 
-            # Adk = A(holocat(grad_u, np.zeros_like(grad_u)))
-            # D1 = np.sqrt(fisher(Au, b))
-            #mu_u = - (norm(grad_u)**2)/ (norm(np.multiply(Adk, D1))**2) 
-            u = np.maximum(0, u + mu_u * grad_u)
+
+            if mu is None:
+                Adk = A(holocat(grad_u, np.zeros_like(grad_u)))
+                D1 = np.sqrt(fisher(Au, b))
+                mu = - (norm(grad_u)**2)/ (norm(np.multiply(Adk, D1))**2) 
+            
+            u = np.maximum(0, u + mu * grad_u)
             # update Au
             Au = A(holocat(u, ref))
             
         # update x
         ##########################################
-        # Implement plug and play      
-        x_tmp = u - eta
-        x_tmp = np.clip(x_tmp, 0, 1)
-        x_tmp = torch.from_numpy(jreshape(x_tmp, sn, sn))[None, None, ...].to(torch.float32).cuda()
-        x_tmp = model(x_tmp)
-        x_tmp = vec(x_tmp.cpu().numpy())
-        x = np.clip(x_tmp, 0, 1)
+        # Implement plug and play  
+        x = denoise(u - eta, model, scale, sn=128)
         ##########################################
         # update eta
         eta = eta + x - u
         out.append(nrmse(x, xtrue))
-        
+                
         if verbose: 
-            print(f'iter: {iter:03d} / {niter:03d} || nrmse (u, xtrue): {nrmse(u, xtrue):.4f} || nrmse (out, xtrue): {out[-1]:.4f}')
+            print(f'iter: {iter:03d} / {niter:03d} || scale: {scale:.2f} || step: {mu:.2e} || nrmse (u, xtrue): {nrmse(u, xtrue):.4f} || nrmse (out, xtrue): {out[-1]:.4f}')
 
     return x, out
+
+
+def denoise(x_tmp, model, scale, sn=128):
+    x_tmp = np.clip(x_tmp, 0, 1)
+    x_tmp = torch.from_numpy(jreshape(x_tmp, sn, sn))[None, None, ...].to(torch.float32).cuda()
+    x_tmp = model(x_tmp * scale)/scale
+    x_tmp = vec(x_tmp.cpu().numpy())
+    x_tmp = np.clip(x_tmp, 0, 1)
+    return x_tmp
+    
