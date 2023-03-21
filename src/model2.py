@@ -25,6 +25,8 @@ from torch.utils.tensorboard import SummaryWriter
 import time, datetime
 
 from accelerate import Accelerator
+import math
+
 
 # constants
 
@@ -418,6 +420,20 @@ class Unet(nn.Module):
         #print(self.final_conv(x).shape) 8 1 16 16
         return torch.squeeze(self.final_conv(x))
     
+###############################################################################
+# Init weights
+###############################################################################
+
+def weights_init_kaiming(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        torch.nn.init.kaiming_normal_(m.weight.data, a=0, mode='fan_in')
+    elif classname.find('Linear') != -1:
+        nn.init.kaiming_normal(m.weight.data, a=0, mode='fan_in')
+    elif classname.find('BatchNorm') != -1:
+        m.weight.data.normal_(mean=0, std=math.sqrt(2./9./64.)).clamp_(-0.025, 0.025)
+        nn.init.constant_(m.bias.data, 0.0)
+        
 class DnCNN(nn.Module):
     def __init__(self, net_config):
         super(DnCNN, self).__init__()
@@ -457,13 +473,30 @@ class DnCNN(nn.Module):
             layers.append(nn.ReLU(inplace=True))
             
         layers.append(conv_fn(in_channels=features, out_channels=oc, kernel_size=kernel_size, padding=padding, bias=False, groups=groups))
-        self.dnn = nn.Sequential(*layers)        
+        self.dnn = nn.Sequential(*layers) 
+        
+        if not is_sn:
+            self.dnn.apply(weights_init_kaiming)      
 
     def forward(self, x):
         out = self.dnn(x)
         if self.is_res:
             out = x - out
         return out
+    
+class Denoise(nn.Module):
+    def __init__(self, dObj, dnn, config):
+        super(Denoise, self).__init__()
+        self.dObj = dObj
+        self.dnn = dnn
+        self.config = config
+        self.name = 'denoise'
+        
+    def forward(self, x_init): 
+        x_next = self.dnn(x_init)
+        return torch.clamp(x_next, min=0, max=torch.inf) 
+
+
 
 if __name__ == "__main__":
     model = Unet(dim = 64)

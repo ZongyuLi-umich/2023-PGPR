@@ -183,7 +183,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
         if 'pnp_pgadmm' in  exp_to_do: 
             # hyper parameters
             rho = 32
-            scale = 1
+            scale = 0.5
             opt_pnppgadmm_scale = False
             opt_pnppgadmm_rho = False
             desp  = '_uiter3_muF'
@@ -207,35 +207,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout = result['xout'].squeeze()
                 cout  = result['cout'].squeeze()
                 print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-            except:
-                if opt_pnppgadmm_scale:
-                    algoHandle = lambda scale: run_alg(alg=alg_name, 
-                                                    sigma=args.sigma, 
-                                                    delta=args.delta, 
-                                                    niter=10, 
-                                                    model=model,
-                                                    scale = scale,
-                                                    rho = rho,
-                                                    verbose = False,
-                                                    **kwargs)
-                    
-                    scale = optimizeTau(kwargs['xtrue'], algoHandle, [0, 2], maxfun=10)
-                print(f'opt scale = {scale}')
-
-                if opt_pnppgadmm_rho:
-                    algoHandle = lambda rho: run_alg(alg=alg_name, 
-                                                    sigma=args.sigma, 
-                                                    delta=args.delta, 
-                                                    niter=10, 
-                                                    model=model,
-                                                    scale = scale,
-                                                    rho = rho,
-                                                    verbose = False,
-                                                    **kwargs)
-                    
-                    rho = optimizeTau(kwargs['xtrue'], algoHandle, [0, 10], maxfun=10)
-                print(f'opt rho = {rho}')
-                                        
+            except:                
                 print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
@@ -275,19 +247,6 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 cout  = result['cout'].squeeze()
                 print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
             except:
-                if opt_pnppgprox_scale:
-                    algoHandle = lambda scale: run_alg(alg=alg_name, 
-                                                    sigma=args.sigma, 
-                                                    delta=args.delta, 
-                                                    niter=20, 
-                                                    model=model,
-                                                    scale = scale,
-                                                    verbose = False,
-                                                    **kwargs)
-                    
-                    scale = optimizeTau(kwargs['xtrue'], algoHandle, [0, 2], maxfun=10)
-                print(f'opt scale = {scale}')
-                
                 ############################################
                 # run
                 ############################################
@@ -308,7 +267,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
         if 'pnp_pgred' in  exp_to_do: 
             # hyper parameters
             scale = 0.5
-            rho   = 50
+            rho   = 100
             opt_pnppgred_scale = False
             desp  = ''
             
@@ -331,20 +290,6 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 cout  = result['cout'].squeeze()
                 print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
             except:
-                if opt_pnppgred_scale:
-                    algoHandle = lambda scale: run_alg(alg=alg_name, 
-                                                    sigma=args.sigma, 
-                                                    delta=args.delta, 
-                                                    niter=20, 
-                                                    model=model,
-                                                    scale = scale,
-                                                    rho = rho,
-                                                    verbose = False,
-                                                    **kwargs)
-                    
-                    scale = optimizeTau(kwargs['xtrue'], algoHandle, [0, 2], maxfun=10)
-                print(f'opt scale = {scale}')
-                
                 ############################################
                 # run
                 ############################################
@@ -352,7 +297,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=20, 
+                                    niter=10, 
                                     model=model, 
                                     scale = scale,
                                     rho = rho,
@@ -397,21 +342,21 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
         
 if __name__ == "__main__":
     import json
-    from model2 import DnCNN
+    from model2 import DnCNN, Denoise
     from collections import OrderedDict
     
     ##################################################
     # Settings 
     ##################################################
-    img_to_do = [0]
-    exp_to_do = ['pois', 'pnp_pgred'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm']
+    img_to_do     = [0]
+    exp_to_do     = ['pois', 'pnp_pgred'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm']
     dataset_name  = 'natureimg'
-    project_root = '/n/higgins/z/xjxu/projects/2023-PGPR'
-    params_config  = f'{project_root}//src/config/params_{dataset_name}.txt'
-    pnp_config = f'{project_root}/src/config/pnp_config.json'
+    project_root  = '/n/higgins/z/xjxu/projects/2023-PGPR'
+    params_config = f'{project_root}//src/config/params_{dataset_name}.txt'
+    pnp_config    = f'{project_root}/src/config/pnp_config.json'
     
     ##################################################
-    # Reproducibility
+    # reproducibility
     ##################################################
     init_env(seed_value=42)
     
@@ -435,27 +380,27 @@ if __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     
     ##################################################
-    # get rObj 
+    # get model 
     ##################################################
-    # load
-    method_config = config['methods']['denoise']
-    dnn_name = method_config['dnn_name']
-    dnn = dnn_dict[dnn_name](config['networks'][dnn_name])
-    dnn.to(device)
+    # load config
+    method_config  = config['methods']['denoise']
+    dataset_config = method_config[dataset_name]
+    dnn_name       = dataset_config['dnn_name']
+    sgm            = dataset_config['sgm']
+    model_path     = dataset_config['model_pool'][f'sgm_{sgm}']
 
-    # restore
-    sgm = method_config['sgm']
-    model_path = method_config['model_path'][f'sgm_{sgm}']
+    # restore model
+    dnn   = dnn_dict[dnn_name](config['networks'][dnn_name])
+    model = Denoise(None, dnn, config)
+    
     checkpoint = torch.load(model_path)['model_state_dict']
-    try: 
-        name = 'dnn.'
-        new_state_dict = OrderedDict({k[len(name):]: v for k, v in checkpoint.items()}) 
-        dnn.load_state_dict(new_state_dict,strict=True)
-    except: 
-        print("Model cannnot load")
+    model.load_state_dict(checkpoint,strict=True)
+    model.to(device)
+    model.eval()
 
     ############################################################
     # run
     ############################################################
     with torch.no_grad():
-        main(parampath = params_config, model = dnn, exp_to_do = exp_to_do, img_to_do=img_to_do, project_root=project_root)
+        main(parampath=params_config, model=model, exp_to_do=exp_to_do, img_to_do=img_to_do, project_root=project_root)
+        
