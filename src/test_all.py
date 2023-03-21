@@ -345,7 +345,6 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
 if __name__ == "__main__":
     import json
     from model2 import DnCNN, Denoise
-    from collections import OrderedDict
     
     ##################################################
     # Settings 
