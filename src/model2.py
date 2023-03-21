@@ -25,7 +25,6 @@ from torch.utils.tensorboard import SummaryWriter
 import time, datetime
 
 from accelerate import Accelerator
-import math
 
 
 # constants
@@ -421,8 +420,10 @@ class Unet(nn.Module):
         return torch.squeeze(self.final_conv(x))
     
 ###############################################################################
-# Init weights
+# Init weights (Xiaojian's code starts here)
 ###############################################################################
+import math
+from  spectral_normalization import SpectralNorm
 
 def weights_init_kaiming(m):
     classname = m.__class__.__name__
@@ -496,7 +497,9 @@ class Denoise(nn.Module):
         x_next = self.dnn(x_init)
         return torch.clamp(x_next, min=0, max=torch.inf) 
 
-
+###############################################################################
+# Xiaojian's code ends here
+###############################################################################
 
 if __name__ == "__main__":
     model = Unet(dim = 64)

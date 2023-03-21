@@ -97,6 +97,7 @@ def run_alg(alg, sigma, delta, niter, reg1=0, reg2=0, model=None, scale = 1, rho
                                 model = model,
                                 mu = None,
                                 scale = scale, 
+                                rho = rho,
                                 verbose = verbose)
     elif alg == 'pnp_pgred':
         xout, cout = pnp_pgred(A=kwargs['A'], 

@@ -7,25 +7,30 @@
         "denoise": {
             "natureimg": {
                 "dnn_name": "dncnn",
-                "sgm":15,
-                "model_pool":{
-                    "sgm_1":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm1/2023-03-17-03-38-27/train/models/best_snr.pth",
-                    "sgm_3":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm3/2023-03-17-03-39-22/train/models/best_snr.pth",
-                    "sgm_5":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm5/2023-03-18-15-45-43/train/models/best_snr.pth",
-                    "sgm_7":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm7/2023-03-18-15-47-24/train/models/best_snr.pth",
-                    "sgm_9":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm9/2023-03-18-15-47-39/train/models/best_snr.pth",
-                    "sgm_15":  "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm15/2023-03-20-13-01-19/train/models/best_snr.pth"
+                "sgm_name": "sgm15",
+                "model_path":{
+                    "sgm1":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm1/2023-03-17-03-38-27/train/models/best_snr.pth",
+                    "sgm3":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm3/2023-03-17-03-39-22/train/models/best_snr.pth",
+                    "sgm5":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm5/2023-03-18-15-45-43/train/models/best_snr.pth",
+                    "sgm7":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm7/2023-03-18-15-47-24/train/models/best_snr.pth",
+                    "sgm9":   "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm9/2023-03-18-15-47-39/train/models/best_snr.pth",
+                    "sgm15":  "/s5/xjxu/exps/denoise/denoise/dncnn/natureimg_sgm15/2023-03-20-13-01-19/train/models/best_snr.pth"
                 }
             },
 
             "virusimg": {
                 "dnn_name": "dncnn",
-                "sgm":15,
-                "model_pool":{
-                    "sgm_9":   "/train/models/best_snr.pth",
-                    "sgm_11":   "",
-                    "sgm_13":   "",
-                    "sgm_15":   ""
+                "sgm_name": "sgm15",
+                "model_path":{
+                    "sgm9":   "/s5/xjxu/exps/denoise/denoise/dncnn/virusimg_sgm9/2023-03-21-01-14-33/train/models/best_snr.pth",
+                    "sgm11":   "/s5/xjxu/exps/denoise/denoise/dncnn/virusimg_sgm11/2023-03-21-01-13-50/train/models/best_snr.pth",
+                    "sgm13":   "/s5/xjxu/exps/denoise/denoise/dncnn/virusimg_sgm13/2023-03-21-01-12-36/train/models/best_snr.pth",
+                    "sgm15":   "/s5/xjxu/exps/denoise/denoise/dncnn/virusimg_sgm15/2023-03-21-01-11-46/train/models/best_snr.pth",
+
+                    "sgm9sn":"/s5/xjxu/exps/denoise/denoise/dncnn/virusimg_sgm9/2023-03-21-01-43-53_sn/train/models/best_snr.pth",
+                    "sgm11sn":"/s5/xjxu/exps/denoise/denoise/dncnn/virusimg_sgm11/2023-03-21-01-43-18_sn/train/models/best_snr.pth",
+                    "sgm13sn":"/s5/xjxu/exps/denoise/denoise/dncnn/virusimg_sgm13/2023-03-21-01-42-42_sn/train/models/best_snr.pth",
+                    "sgm15sn":"/s5/xjxu/exps/denoise/denoise/dncnn/virusimg_sgm15/2023-03-21-01-41-55_sn/train/models/best_snr.pth"
                 }
             }
 

@@ -21,7 +21,7 @@ def get_grad(sigma, delta):
     return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
 
 
-def pnp_pgprox(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, mu = None, scale = 1, verbose=True):
+def pnp_pgprox(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, mu = None, scale = 1, rho=1, verbose=True):
     
     # xiaojian
     # x0 = denoise(x0, model, scale, sn=128)
@@ -41,13 +41,15 @@ def pnp_pgprox(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, mu = Non
             D1 = np.sqrt(fisher(Ax, b))
             mu = - (norm(grad_x)**2)/ (norm(np.multiply(Adk, D1))**2) 
         
-        u = np.maximum(0, x + mu * grad_x)
-        x = denoise(u, model, scale, sn=128)        
+        x1 = np.maximum(0, x + mu * grad_x)
+        x2 = denoise(x1, model, scale, sn=128)  
+        x = (1-rho) * x1 + rho * x2
+              
         Ax = A(holocat(x, ref))
         out.append(nrmse(x, xtrue))
         
         if verbose: 
-            print(f'iter: {iter:03d} / {niter:03d} || scale: {scale:.2f} || step: {mu:.2e} || nrmse (u, xtrue): {nrmse(u, xtrue):.4f} || nrmse (out, xtrue): {out[-1]:.4f}')
+            print(f'iter: {iter:03d} / {niter:03d} || scale: {scale:.2f} || step: {mu:.2e} || nrmse (x1, xtrue): {nrmse(x1, xtrue):.4f} || nrmse (x2, xtrue): {nrmse(x2, xtrue):.4f} || nrmse (out, xtrue): {out[-1]:.4f}')
 
     return x, out
 

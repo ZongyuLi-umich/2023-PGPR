@@ -182,14 +182,14 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
         
         if 'pnp_pgadmm' in  exp_to_do: 
             # hyper parameters
-            rho = 32
             scale = 0.5
+            rho = 32
             opt_pnppgadmm_scale = False
             opt_pnppgadmm_rho = False
             desp  = '_uiter3_muF'
             
             alg_name = 'pnp_pgadmm'
-            exp_dir = f'{results_dir}/{alg_name}/sgm{sgm}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}/{sgm_name}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
             copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
@@ -212,7 +212,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=20, 
+                                    niter=50, 
                                     model=model, 
                                     scale = scale,
                                     rho = rho,
@@ -225,11 +225,12 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
         if 'pnp_pgprox' in  exp_to_do: 
             # hyper parameters
             scale = 0.5
+            rho   = 0.5
             opt_pnppgprox_scale = False
             desp  = ''
             
             alg_name = 'pnp_pgprox'
-            exp_dir = f'{results_dir}/{alg_name}/sgm{sgm}_scale{scale}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}/{sgm_name}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
             copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
@@ -257,6 +258,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                                     niter=20, 
                                     model=model, 
                                     scale = scale,
+                                    rho = rho,
                                     **kwargs)
 
                 result = {'xout': xout, 'cout': cout}
@@ -272,7 +274,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
             desp  = ''
             
             alg_name = 'pnp_pgred'
-            exp_dir = f'{results_dir}/{alg_name}/sgm{sgm}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}/{sgm_name}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
             copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
@@ -297,7 +299,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=10, 
+                                    niter=20, 
                                     model=model, 
                                     scale = scale,
                                     rho = rho,
@@ -349,8 +351,8 @@ if __name__ == "__main__":
     # Settings 
     ##################################################
     img_to_do     = [0]
-    exp_to_do     = ['pois', 'pnp_pgred'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm']
-    dataset_name  = 'natureimg'
+    exp_to_do     = ['pois', 'pnp_pgadmm'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred']
+    dataset_name  = 'virusimg'
     project_root  = '/n/higgins/z/xjxu/projects/2023-PGPR'
     params_config = f'{project_root}//src/config/params_{dataset_name}.txt'
     pnp_config    = f'{project_root}/src/config/pnp_config.json'
@@ -386,8 +388,8 @@ if __name__ == "__main__":
     method_config  = config['methods']['denoise']
     dataset_config = method_config[dataset_name]
     dnn_name       = dataset_config['dnn_name']
-    sgm            = dataset_config['sgm']
-    model_path     = dataset_config['model_pool'][f'sgm_{sgm}']
+    sgm_name       = dataset_config['sgm_name']
+    model_path     = dataset_config['model_path'][sgm_name]
 
     # restore model
     dnn   = dnn_dict[dnn_name](config['networks'][dnn_name])
@@ -396,7 +398,7 @@ if __name__ == "__main__":
     checkpoint = torch.load(model_path)['model_state_dict']
     model.load_state_dict(checkpoint,strict=True)
     model.to(device)
-    model.eval()
+    # model.eval()
 
     ############################################################
     # run
