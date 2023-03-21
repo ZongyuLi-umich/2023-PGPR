@@ -212,7 +212,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=30, 
+                                    niter=20, 
                                     model=model, 
                                     scale = scale,
                                     rho = rho,
