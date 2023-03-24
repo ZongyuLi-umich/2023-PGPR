@@ -3,7 +3,6 @@ from email import utils
 
 from utils2 import *
 import numpy as np
-from config_parser import *
 from run_alg import *
 from dataloader import *
 import sys
@@ -14,20 +13,28 @@ import scipy.io as sio
 import transcript
 import os, time, datetime
 
-def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to_do=[], project_root=''):
-    parser = configparser(path=parampath)
-    args = parser.parse_args()
-    print('config args: ', args)
+def test_all(args = {}, model_pnp = None, model_score=None,
+            exp_to_do = [], img_to_do=[], project_root=''):
+    
+    # pass empty list to test on all images
+    root_result_dir = f'{args.savedir}'
+    check_and_mkdir(root_result_dir)
+    transcript.start(root_result_dir + '/logfile.log', mode='a')
+    print('config args: ', args.__dict__)
 
     dataset = PrDataset(path=args.datadir, 
                         N=args.imgsize, 
                         scalefact=args.scaleSYS, 
                         sigma=args.sigma)
+    transcript.stop()
     
+    if not img_to_do:
+        img_to_do = range(len(dataset.data['xtrue']))
+        
     for i in img_to_do:
         
         #  make folders
-        results_dir = f'{args.savedir}_imgsize{args.imgsize}_sf{args.scaleSYS}_sigma{args.sigma}/{i}'
+        results_dir = f'{root_result_dir}/{i}'
         check_and_mkdir(results_dir)
         
         # load init data
@@ -80,7 +87,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                             sigma=0, 
                                             delta=0, 
-                                            niter=200, 
+                                            niter=args.gau_niter, 
                                             **kwargs)
                 result = {'xout': xout, 'cout': cout}
                 sio.savemat(f'{exp_path}', result)
@@ -107,7 +114,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=0, 
                                     delta=0, 
-                                    niter=200, 
+                                    niter=args.pois_niter, 
                                     **kwargs)
                 result = {'xout': xout, 'cout': cout}
                 sio.savemat(f'{exp_path}', result)
@@ -139,7 +146,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=10, 
+                                    niter=args.pg_niter, 
                                     **kwargs)
                 result = {'xout': xout, 'cout': cout}
                 sio.savemat(f'{exp_path}', result)
@@ -170,7 +177,7 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=50, 
+                                    niter=args.pgTV_niter, 
                                     reg1=args.regTV, 
                                     reg2=0.1, 
                                     **kwargs)
@@ -182,14 +189,14 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
         
         if 'pnp_pgadmm' in  exp_to_do: 
             # hyper parameters
-            scale = 0.5
-            rho = 32
+            scale = args.pgADMM_scale
+            rho = args.pgADMM_rho
             opt_pnppgadmm_scale = False
             opt_pnppgadmm_rho = False
             desp  = '_uiter3_muF'
             
             alg_name = 'pnp_pgadmm'
-            exp_dir = f'{results_dir}/{alg_name}/{sgm_name}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}/scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
             copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
@@ -212,8 +219,8 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=20, 
-                                    model=model, 
+                                    niter=args.pgADMM_niter, 
+                                    model=model_pnp, 
                                     scale = scale,
                                     rho = rho,
                                     **kwargs)
@@ -224,13 +231,13 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
             
         if 'pnp_pgprox' in  exp_to_do: 
             # hyper parameters
-            scale = 0.5
-            rho   = 0.5
+            scale = args.pgPROX_scale
+            rho   = args.pgPROX_rho
             opt_pnppgprox_scale = False
             desp  = ''
             
             alg_name = 'pnp_pgprox'
-            exp_dir = f'{results_dir}/{alg_name}/{sgm_name}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}/scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
             copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
@@ -255,8 +262,8 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=20, 
-                                    model=model, 
+                                    niter=args.pgPROX_niter, 
+                                    model=model_pnp, 
                                     scale = scale,
                                     rho = rho,
                                     **kwargs)
@@ -268,13 +275,13 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
             
         if 'pnp_pgred' in  exp_to_do: 
             # hyper parameters
-            scale = 0.5
-            rho   = 100
+            scale = args.pgRED_scale
+            rho   = args.pgRED_rho
             opt_pnppgred_scale = False
             desp  = ''
             
             alg_name = 'pnp_pgred'
-            exp_dir = f'{results_dir}/{alg_name}/{sgm_name}_scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}/scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
             check_and_mkdir(exp_dir)
             copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
@@ -299,8 +306,8 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                     sigma=args.sigma, 
                                     delta=args.delta, 
-                                    niter=20, 
-                                    model=model, 
+                                    niter=args.pgRED_niter, 
+                                    model=model_pnp, 
                                     scale = scale,
                                     rho = rho,
                                     **kwargs)
@@ -334,74 +341,11 @@ def main(parampath = './config/params.txt', model = None, exp_to_do = [], img_to
                 xout, cout = run_alg(alg=alg_name, 
                                             sigma=args.sigma, 
                                             delta=args.delta, 
-                                            niter=20, 
-                                            model=model, 
+                                            niter=args.pgSCORE_niter, 
+                                            model=model_score, 
                                             **kwargs)
                 result = {'xout': xout, 'cout': cout}
                 sio.savemat(f'{exp_path}', result)
             print(f'nrmse of {alg_name}: ', cout[-1])
             transcript.stop()
-        
-if __name__ == "__main__":
-    import json
-    from model2 import DnCNN, Denoise
-    
-    ##################################################
-    # Settings 
-    ##################################################
-    img_to_do     = [0]
-    exp_to_do     = ['pois', 'pnp_pgadmm'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred']
-    dataset_name  = 'virusimg'
-    project_root  = '/n/higgins/z/xjxu/projects/2023-PGPR'
-    params_config = f'{project_root}//src/config/params_{dataset_name}.txt'
-    pnp_config    = f'{project_root}/src/config/pnp_config.json'
-    
-    ##################################################
-    # reproducibility
-    ##################################################
-    init_env(seed_value=42)
-    
-    ##################################################
-    # statistic
-    ##################################################
-    dnn_dict = {'dncnn': DnCNN}
-
-    ##################################################
-    # load config
-    ##################################################
-    with open(pnp_config) as File:
-        config = json.load(File)
-        
-    ##################################################
-    # init the gpu usages
-    ##################################################
-    gpu_ids = config['settings']['gpu_ids']
-    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    
-    ##################################################
-    # get model 
-    ##################################################
-    # load config
-    method_config  = config['methods']['denoise']
-    dataset_config = method_config[dataset_name]
-    dnn_name       = dataset_config['dnn_name']
-    sgm_name       = dataset_config['sgm_name']
-    model_path     = dataset_config['model_path'][sgm_name]
-
-    # restore model
-    dnn   = dnn_dict[dnn_name](config['networks'][dnn_name])
-    model = Denoise(None, dnn, config)
-    
-    checkpoint = torch.load(model_path)['model_state_dict']
-    model.load_state_dict(checkpoint,strict=True)
-    model.to(device)
-    # model.eval()
-
-    ############################################################
-    # run
-    ############################################################
-    with torch.no_grad():
-        main(parampath=params_config, model=model, exp_to_do=exp_to_do, img_to_do=img_to_do, project_root=project_root)
         

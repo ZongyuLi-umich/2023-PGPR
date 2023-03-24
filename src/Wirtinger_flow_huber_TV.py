@@ -57,7 +57,7 @@ def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, r
                 Ax_new = Ax + mu * Adk
                 Tx_new = Tx + mu * Tdk
         elif sthow == 'empirical':
-            mu = -0.0001
+            mu = -0.00005
         else:
             raise NotImplementedError
         x += mu * grad_f
