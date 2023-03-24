@@ -44,8 +44,12 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             #grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + reg1 * diff2d_adj(grad_huber_v(Tx, reg2), sn, sn)
             grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + 1*scorepart
             
+            Adk = A(holocat(grad_f, np.zeros_like(grad_f)))
+            D1 = np.sqrt(fisher(Ax, b))
+            # mu = - (norm(grad_f)**2)/ (norm(np.multiply(Adk, D1))**2) * (sigmas[iter]/0.05)**2
             #mu = - (norm(grad_f)**2) / (norm(np.multiply(Adk, D1))**2 + reg1 * (norm(np.multiply(Tdk, D2))**2))
-            mu = -0.001*(sigmas[iter]/0.05)**2
+            mu = -0.002*(sigmas[iter]/0.05)**2
+            # mu = -(sigmas[iter]**2)/4
             x += mu * grad_f
             x[(x < 0)] = 0 # set non-negatives to zero
             Ax = A(holocat(x, ref))

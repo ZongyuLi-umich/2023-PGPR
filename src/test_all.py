@@ -30,7 +30,10 @@ def test_all(args = {}, model_pnp = None, model_score=None,
     
     if not img_to_do:
         img_to_do = range(len(dataset.data['xtrue']))
-        
+    
+    if not exp_to_do:
+        exp_to_do = ['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred', 'pnp_pgred_noise2self', 'pg_score']
+    
     for i in img_to_do:
         
         #  make folders
@@ -93,6 +96,7 @@ def test_all(args = {}, model_pnp = None, model_score=None,
                 sio.savemat(f'{exp_path}', result)
             print(f'nrmse of {alg_name}: ', cout[-1])
             transcript.stop()
+            xout_gau = xout
                 
 
         if 'pois' in  exp_to_do:  
@@ -196,9 +200,9 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             desp  = '_uiter3_muF'
             
             alg_name = 'pnp_pgadmm'
-            exp_dir = f'{results_dir}/{alg_name}/scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}'
             check_and_mkdir(exp_dir)
-            copytree_code(f'{project_root}/src', exp_dir + '/')
+            # copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
             
             transcript.start(exp_dir + '/logfile.log', mode='a')
@@ -237,9 +241,9 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             desp  = ''
             
             alg_name = 'pnp_pgprox'
-            exp_dir = f'{results_dir}/{alg_name}/scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}'
             check_and_mkdir(exp_dir)
-            copytree_code(f'{project_root}/src', exp_dir + '/')
+            # copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
             
             transcript.start(exp_dir + '/logfile.log', mode='a')
@@ -281,9 +285,53 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             desp  = ''
             
             alg_name = 'pnp_pgred'
-            exp_dir = f'{results_dir}/{alg_name}/scale{scale}_rho{rho}/{str(datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))}{desp}'
+            exp_dir = f'{results_dir}/{alg_name}'
             check_and_mkdir(exp_dir)
-            copytree_code(f'{project_root}/src', exp_dir + '/')
+            # copytree_code(f'{project_root}/src', exp_dir + '/')
+            exp_path = f'{exp_dir}/result.mat'
+            
+            transcript.start(exp_dir + '/logfile.log', mode='a')
+            print('\n###########################################################')
+            print(f'{alg_name}')
+            print('###########################################################')
+            
+            kwargs['x0'] = xout_pois
+            print(f'[Old]: re-init x0 from result_pois.')
+            try: 
+                result = sio.loadmat(exp_path)
+                xout = result['xout'].squeeze()
+                cout  = result['cout'].squeeze()
+                print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
+            except:
+                ############################################
+                # run
+                ############################################
+                print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
+                xout, cout = run_alg(alg=alg_name, 
+                                    sigma=args.sigma, 
+                                    delta=args.delta, 
+                                    niter=args.pgRED_niter, 
+                                    model=model_pnp, 
+                                    scale = scale,
+                                    rho = rho,
+                                    **kwargs)
+
+                result = {'xout': xout, 'cout': cout}
+                sio.savemat(f'{exp_path}', result)
+            print(f'nrmse of {alg_name}: ', cout[-1])
+            transcript.stop()
+        
+        if 'pnp_pgred_noise2self' in  exp_to_do: 
+            # hyper parameters
+            scale = args.pgRED_scale
+            rho   = args.pgRED_rho
+            opt_pnppgred_scale = False
+            desp  = ''
+            
+            alg_name = 'pnp_pgred_noise2self'
+            exp_dir = f'{results_dir}/{alg_name}'
+            check_and_mkdir(exp_dir)
+            # copytree_code(f'{project_root}/src', exp_dir + '/')
             exp_path = f'{exp_dir}/result.mat'
             
             transcript.start(exp_dir + '/logfile.log', mode='a')
@@ -348,4 +396,27 @@ def test_all(args = {}, model_pnp = None, model_score=None,
                 sio.savemat(f'{exp_path}', result)
             print(f'nrmse of {alg_name}: ', cout[-1])
             transcript.stop()
+    make_summary(root_result_dir, img_to_do, exp_to_do)
         
+        
+def make_summary(root_result_dir, img_to_do, exp_to_do):
+    all_data = {}
+    for algname in exp_to_do:
+        all_data[algname] = np.zeros(len(img_to_do))
+    for i, idx in enumerate(img_to_do):
+        results_dir = f'{root_result_dir}/{idx}'
+        for alg_name in exp_to_do:
+            alg_dir = f'{results_dir}/{alg_name}'
+            with open(f'{alg_dir}/logfile.log', 'r') as f:
+                last_line = f.readlines()[-1]
+                nrmse = last_line.split(' ')[-1]
+                all_data[alg_name][i] = nrmse
+    transcript.start(root_result_dir + '/summary.log', mode='a')
+    print('###########################################################')
+    print('summary result')
+    print('###########################################################')
+    for key in all_data.keys():
+        print(f'alg name: {key} || mean: {np.mean(all_data[key]):.4f} || std: {np.std(all_data[key]):.4f} || max: {np.amax(all_data[key]):.4f} || min: {np.amin(all_data[key]):.4f}')
+    transcript.stop()
+            
+    

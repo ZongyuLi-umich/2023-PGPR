@@ -6,6 +6,7 @@ from Wirtinger_flow_score import *
 from pnp_pgadmm import *
 from pnp_pgprox import *
 from pnp_pgred import *
+from pnp_pgred_noise2self import *
 
 
 def run_alg(alg, sigma, delta, niter, reg1=0, reg2=0, model=None, scale = 1, rho=32, verbose=True,  **kwargs):
@@ -18,7 +19,7 @@ def run_alg(alg, sigma, delta, niter, reg1=0, reg2=0, model=None, scale = 1, rho
                                        ref=kwargs['ref'], 
                                        niter=niter, 
                                        gradhow='gau', 
-                                       sthow='fisher', 
+                                       sthow='lineser', 
                                        reg1=0, 
                                        reg2=0, 
                                        xtrue=kwargs['xtrue'],
@@ -115,7 +116,22 @@ def run_alg(alg, sigma, delta, niter, reg1=0, reg2=0, model=None, scale = 1, rho
                                 scale = scale, 
                                 rho = rho,
                                 verbose = verbose)
-                                
+    elif alg == 'pnp_pgred_noise2self':
+        xout, cout = pnp_pgred_noise2self(A=kwargs['A'], 
+                                At=kwargs['At'], 
+                                y=kwargs['y'], 
+                                b=kwargs['b'], 
+                                x0=kwargs['x0'], 
+                                ref=kwargs['ref'], 
+                                sigma=sigma, 
+                                delta=delta, 
+                                niter=niter, 
+                                xtrue=kwargs['xtrue'], 
+                                model = model,
+                                mu = None,
+                                scale = scale, 
+                                rho = rho,
+                                verbose = verbose)                            
                         
     elif alg == 'pg_score':
         xout, cout = Wintinger_flow_score(A=kwargs['A'], 

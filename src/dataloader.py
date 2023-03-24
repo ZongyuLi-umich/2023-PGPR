@@ -35,7 +35,7 @@ class PrDataset:
                     else:
                         img = np.array(Image.open(os.path.join(dirpath, filename)))
                     res_img = cv2.resize(img, dsize=(self.N, self.N))
-                    xtrue = np.array(res_img) / np.max(res_img)
+                    xtrue = np.array(res_img)
                     print('min/max: {}/{}'.format(np.min(xtrue), np.max(xtrue)))
                     self.data['xtrue'].append(xtrue)
                 elif filename.endswith(self.mat_format):
@@ -45,7 +45,7 @@ class PrDataset:
                     for j in range(img.shape[-1]):
                         res_img = cv2.resize(np.squeeze(img[:,:,j]), 
                                              dsize=(self.N, self.N))
-                        xtrue = np.array(res_img) / np.max(res_img)
+                        xtrue = np.array(res_img) 
                         print('min/max: {}/{}'.format(np.min(xtrue), np.max(xtrue)))
                         self.data['xtrue'].append(xtrue)
                 else:

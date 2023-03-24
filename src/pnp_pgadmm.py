@@ -36,6 +36,7 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, rho, uit
     eta = np.zeros(N)
     _, grad_phi, fisher = get_grad(sigma, delta)
 
+    lastnrmse = 1
     for iter in range(niter):
         
         # update u
@@ -60,6 +61,10 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, rho, uit
         # update eta
         eta = eta + x - u
         out.append(nrmse(x, xtrue))
+        
+        if lastnrmse-out[-1] < 0.0001:
+            break
+        lastnrmse = out[-1]
                 
         if verbose: 
             print(f'iter: {iter:03d} / {niter:03d} || scale: {scale:.2f} || step: {mu:.2e} || nrmse (u, xtrue): {nrmse(u, xtrue):.4f} || nrmse (out, xtrue): {out[-1]:.4f}')
@@ -68,10 +73,11 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, rho, uit
 
 
 def denoise(x_tmp, model, scale, sn=128):
-    x_tmp = np.clip(x_tmp, 0, 1)
-    x_tmp = torch.from_numpy(jreshape(x_tmp, sn, sn))[None, None, ...].to(torch.float32).cuda()
-    x_tmp = model(x_tmp * scale)/scale
-    x_tmp = vec(x_tmp.cpu().numpy())
-    x_tmp = np.clip(x_tmp, 0, 1)
-    return x_tmp
+    with torch.no_grad():
+        x_tmp = np.clip(x_tmp, 0, 1)
+        x_tmp = torch.from_numpy(jreshape(x_tmp, sn, sn))[None, None, ...].to(torch.float32).cuda()
+        x_tmp = model(x_tmp * scale)/scale
+        x_tmp = vec(x_tmp.cpu().numpy())
+        x_tmp = np.clip(x_tmp, 0, 1)
+        return x_tmp
     
