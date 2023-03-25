@@ -3,7 +3,7 @@
         "gpu_ids": "0"
     },
     "expargs":{
-        "savedir": "../result/purple-test-purple-new",
+        "savedir": "../result/purple-test-purple-correct",
         "datadir": "../data/purple",
         "imgsize": 128,
         "scaleSYS": 0.02,

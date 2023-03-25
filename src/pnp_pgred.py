@@ -50,7 +50,7 @@ def pnp_pgred(A, At, y, b, x0, ref, sigma, delta, niter,  xtrue, model, mu = Non
         Ax = A(holocat(x, ref))
         out.append(nrmse(x, xtrue))
         
-        if lastnrmse-out[-1] < 0.0001:
+        if np.abs(lastnrmse-out[-1]) < 1e-5:
             break
         lastnrmse = out[-1]
         

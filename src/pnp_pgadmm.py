@@ -35,7 +35,7 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, rho, uit
     Au = A(holocat(u, ref))
     eta = np.zeros(N)
     _, grad_phi, fisher = get_grad(sigma, delta)
-
+    
     lastnrmse = 1
     for iter in range(niter):
         
@@ -62,10 +62,10 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, rho, uit
         eta = eta + x - u
         out.append(nrmse(x, xtrue))
         
-        if lastnrmse-out[-1] < 0.0001:
+        if np.abs(lastnrmse-out[-1]) < 1e-5:
             break
-        lastnrmse = out[-1]
-                
+        lastnrmse = out[-1]        
+        
         if verbose: 
             print(f'iter: {iter:03d} / {niter:03d} || scale: {scale:.2f} || step: {mu:.2e} || nrmse (u, xtrue): {nrmse(u, xtrue):.4f} || nrmse (out, xtrue): {out[-1]:.4f}')
 

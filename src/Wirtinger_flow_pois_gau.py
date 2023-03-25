@@ -45,7 +45,7 @@ def Wintinger_flow_pois_gau(A, At, y, b, x0, ref, sigma, delta,
         Ax = A(holocat(x, ref))
         Tx = diff2d_forw(x, sn, sn)
         out.append(nrmse(x, xtrue))
-        if lastnrmse-out[-1] < 0.0001:
+        if np.abs(lastnrmse-out[-1]) < 1e-5:
             break
         lastnrmse = out[-1]
         if verbose: 
