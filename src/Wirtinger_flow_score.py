@@ -48,7 +48,7 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             D1 = np.sqrt(fisher(Ax, b))
             # mu = - (norm(grad_f)**2)/ (norm(np.multiply(Adk, D1))**2) * (sigmas[iter]/0.05)**2
             #mu = - (norm(grad_f)**2) / (norm(np.multiply(Adk, D1))**2 + reg1 * (norm(np.multiply(Tdk, D2))**2))
-            mu = -0.002*(sigmas[iter]/0.05)**2
+            mu = -0.001*(sigmas[iter]/0.05)**2
             # mu = -(sigmas[iter]**2)/4
             x += mu * grad_f
             x[(x < 0)] = 0 # set non-negatives to zero

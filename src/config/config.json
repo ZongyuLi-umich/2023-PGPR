@@ -3,8 +3,9 @@
         "gpu_ids": "0"
     },
     "expargs":{
-        "savedir": "../result/purple-test-purple-correct",
+        "savedir": "../result/purple-test-purple-correct-gau",
         "datadir": "../data/purple",
+        "init": "Gaussian",
         "imgsize": 128,
         "scaleSYS": 0.02,
         "sigma": 1,

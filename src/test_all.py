@@ -137,8 +137,14 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             print(f'{alg_name}')
             print('###########################################################')
             
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
+            if args.init == 'Gaussian':
+                kwargs['x0'] = xout_gau
+                print(f'[Old]: re-init x0 from result_gau.')
+            elif args.init == 'Poisson':
+                kwargs['x0'] = xout_pois
+                print(f'[Old]: re-init x0 from result_pois.')
+            else:
+                return NotImplementedError
 
             try: 
                 result = sio.loadmat(exp_path)
@@ -168,8 +174,14 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             print(f'{alg_name}')
             print('###########################################################')
             
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
+            if args.init == 'Gaussian':
+                kwargs['x0'] = xout_gau
+                print(f'[Old]: re-init x0 from result_gau.')
+            elif args.init == 'Poisson':
+                kwargs['x0'] = xout_pois
+                print(f'[Old]: re-init x0 from result_pois.')
+            else:
+                return NotImplementedError
 
             try: 
                 result = sio.loadmat(exp_path)
@@ -210,8 +222,14 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             print(f'{alg_name}')
             print('###########################################################')
             
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
+            if args.init == 'Gaussian':
+                kwargs['x0'] = xout_gau
+                print(f'[Old]: re-init x0 from result_gau.')
+            elif args.init == 'Poisson':
+                kwargs['x0'] = xout_pois
+                print(f'[Old]: re-init x0 from result_pois.')
+            else:
+                return NotImplementedError
             
             try: 
                 result = sio.loadmat(exp_path)
@@ -251,8 +269,15 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             print(f'{alg_name}')
             print('###########################################################')
             
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
+            if args.init == 'Gaussian':
+                kwargs['x0'] = xout_gau
+                print(f'[Old]: re-init x0 from result_gau.')
+            elif args.init == 'Poisson':
+                kwargs['x0'] = xout_pois
+                print(f'[Old]: re-init x0 from result_pois.')
+            else:
+                return NotImplementedError
+            
             try: 
                 result = sio.loadmat(exp_path)
                 xout = result['xout'].squeeze()
@@ -295,8 +320,15 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             print(f'{alg_name}')
             print('###########################################################')
             
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
+            if args.init == 'Gaussian':
+                kwargs['x0'] = xout_gau
+                print(f'[Old]: re-init x0 from result_gau.')
+            elif args.init == 'Poisson':
+                kwargs['x0'] = xout_pois
+                print(f'[Old]: re-init x0 from result_pois.')
+            else:
+                return NotImplementedError
+            
             try: 
                 result = sio.loadmat(exp_path)
                 xout = result['xout'].squeeze()
@@ -339,8 +371,15 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             print(f'{alg_name}')
             print('###########################################################')
             
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
+            if args.init == 'Gaussian':
+                kwargs['x0'] = xout_gau
+                print(f'[Old]: re-init x0 from result_gau.')
+            elif args.init == 'Poisson':
+                kwargs['x0'] = xout_pois
+                print(f'[Old]: re-init x0 from result_pois.')
+            else:
+                return NotImplementedError
+            
             try: 
                 result = sio.loadmat(exp_path)
                 xout = result['xout'].squeeze()
@@ -376,8 +415,15 @@ def test_all(args = {}, model_pnp = None, model_score=None,
             print(f'{alg_name}')
             print('###########################################################')
             
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
+            if args.init == 'Gaussian':
+                kwargs['x0'] = xout_gau
+                print(f'[Old]: re-init x0 from result_gau.')
+            elif args.init == 'Poisson':
+                kwargs['x0'] = xout_pois
+                print(f'[Old]: re-init x0 from result_pois.')
+            else:
+                return NotImplementedError
+            
 
             try: 
                 result = sio.loadmat(exp_path)
