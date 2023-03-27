@@ -3,11 +3,12 @@
         "gpu_ids": "0"
     },
     "expargs":{
-        "savedir": "../result/purple-test-purple-correct-gau",
+        "savedir": "../result/purple-poisson-init-parallel-test",
         "datadir": "../data/purple",
-        "init": "Gaussian",
+        "init": "Poisson",
+        "ncore": 4,
         "imgsize": 128,
-        "scaleSYS": 0.02,
+        "scaleSYS": 0.03,
         "sigma": 1,
         "delta": 5,
         "regTV": 32,

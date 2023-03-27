@@ -44,7 +44,7 @@ def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, r
         if sthow == 'fisher':
             mu = - (norm(grad_f)**2) / (norm(np.multiply(Adk, D1))**2 + reg1 * (norm(np.multiply(Tdk, D2))**2))
         elif sthow == 'lineser':
-            mu = -0.01
+            mu = -1
             Ax_old = np.copy(Ax)
             Tx_old = np.copy(Tx)
             cost_old = cost_fun(Ax_old, Tx_old)

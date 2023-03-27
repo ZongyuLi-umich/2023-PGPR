@@ -1,12 +1,13 @@
 import json
 from model2 import DnCNN, Denoise
 from test_all import *
+from model2 import Unet
 
 if __name__ == "__main__":
     ##################################################
     # Settings 
     ##################################################
-    img_to_do     = []
+    img_to_do     = [16,17,18,19]
     exp_to_do     = [] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred', 'pnp_pgred_noise2self', 'pg_score']
     dataset_name  = 'virusimg'
     project_root  = '/home/lizongyu/PycharmProjects/2023-PGPR'
@@ -73,5 +74,5 @@ if __name__ == "__main__":
     ############################################################
     # with torch.no_grad():
     test_all(args=args, model_pnp=model_pnp, model_score=model_score,
-            exp_to_do=exp_to_do, img_to_do=img_to_do, project_root=project_root)
+            exp_to_do=exp_to_do, img_to_do=img_to_do)
             

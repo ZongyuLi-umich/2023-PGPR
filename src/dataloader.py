@@ -31,9 +31,9 @@ class PrDataset:
                 if filename.split('.')[-1] in self.img_format: 
                     print('load data from: ', os.path.join(dirpath, filename))
                     if filename.endswith('.tiff'):
-                        img = tiff.imread(os.path.join(dirpath, filename))
+                        img = tiff.imread(os.path.join(dirpath, filename)) / 255
                     else:
-                        img = np.array(Image.open(os.path.join(dirpath, filename)))
+                        img = np.array(Image.open(os.path.join(dirpath, filename))) / 255
                     res_img = cv2.resize(img, dsize=(self.N, self.N))
                     xtrue = np.array(res_img)
                     print('min/max: {}/{}'.format(np.min(xtrue), np.max(xtrue)))
