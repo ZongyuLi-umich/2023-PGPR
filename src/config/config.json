@@ -3,15 +3,15 @@
         "gpu_ids": "0"
     },
     "expargs":{
-        "savedir": "../result/purple-poisson-init-parallel-test",
+        "savedir": "../result/purple-poisson-correctself",
         "datadir": "../data/purple",
         "init": "Poisson",
-        "ncore": 4,
+        "ncore": 5,
         "imgsize": 128,
         "scaleSYS": 0.03,
         "sigma": 1,
         "delta": 5,
-        "regTV": 32,
+        "regTV": 64,
         "gau_niter": 50,
         "pois_niter": 50,
         "pg_niter": 50,

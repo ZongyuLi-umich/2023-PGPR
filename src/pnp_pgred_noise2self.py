@@ -1,7 +1,7 @@
 # pnp_pgred_noise2self.py
 # plug and play RED method for Poisson+Gaussian Phase Retrieval
 from ast import AugLoad
-
+import copy
 from utils2 import * 
 import numpy as np
 from numpy.linalg import norm
@@ -37,8 +37,10 @@ def pnp_pgred_noise2self(A, At, y, b, x0, ref, sigma, delta, niter,
     x = np.copy(x0)
     Ax = A(holocat(x, ref))
     _, grad_phi, fisher = get_grad(sigma, delta)
+    print('Deep copy the pre-trained model and finetune it!')
+    model_copy = copy.deepcopy(model)
     ########## pretrain on x0 ################
-    model_tuned = pretrain(noisy=x, model=model, masker=masker, 
+    model_tuned = pretrain(noisy=x, model=model_copy, masker=masker, 
                            niter=200, sn=sn)
     print('********finetune finished!*********')
 
