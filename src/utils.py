@@ -6,6 +6,7 @@ import os
 import torch
 import shutil
 import random
+import transcript
 
 ###############################################################################
 # (Xiaojian's start)
@@ -189,6 +190,27 @@ class Dict2Class(object):
         for key in my_dict:
             setattr(self, key, my_dict[key])
 
+def make_summary(root_result_dir, img_to_do, exp_to_do):
+    all_data = {}
+    for algname in exp_to_do:
+        all_data[algname] = np.zeros(len(img_to_do))
+    for i, idx in enumerate(img_to_do):
+        results_dir = f'{root_result_dir}/{idx}'
+        for alg_name in exp_to_do:
+            alg_dir = f'{results_dir}/{alg_name}'
+            with open(f'{alg_dir}/logfile.log', 'r') as f:
+                last_line = f.readlines()[-1]
+                nrmse = last_line.split(' ')[-1]
+                all_data[alg_name][i] = nrmse
+    transcript.start(root_result_dir + '/summary.log', mode='a')
+    print('###########################################################')
+    print('summary result')
+    print('###########################################################')
+    for key in all_data.keys():
+        print(f'alg name: {key} || mean: {np.mean(all_data[key]):.4f} || std: {np.std(all_data[key]):.4f} || max: {np.amax(all_data[key]):.4f} || min: {np.amin(all_data[key]):.4f}')
+    transcript.stop()
+    
+    
 if __name__ == "__main__":
     parser = config_parser()
     args = parser.parse_args()

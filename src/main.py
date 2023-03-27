@@ -73,6 +73,6 @@ if __name__ == "__main__":
     # run
     ############################################################
     # with torch.no_grad():
-    test_all(args=args, model_pnp=model_pnp, model_score=model_score,
-            exp_to_do=exp_to_do, img_to_do=img_to_do)
-            
+    test_all(args=args, model_pnp=model_pnp, model_score=model_score, 
+             exp_to_do=exp_to_do, img_to_do=img_to_do)   
+        
