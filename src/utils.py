@@ -22,21 +22,6 @@ def init_env(seed_value=42):
     torch.manual_seed(seed_value)
     np.random.seed(seed_value)
 
-def copytree_code(src_path, save_path):
-    max_code_save = 100
-    for i in range(max_code_save):
-        code_path = save_path + 'code%d/' % i
-        if not os.path.exists(code_path):
-            shutil.copytree(src=src_path, dst=code_path)
-            break
-  
-from scipy.optimize import fminbound
-def optimizeTau(x, algoHandle, taurange, maxfun=20):
-    evaluateSNR = lambda x, xhat: 20 * np.log10(
-        np.linalg.norm(x.flatten('F')) / np.linalg.norm(x.flatten('F') - xhat.flatten('F')))
-    fun = lambda tau: -evaluateSNR(x, algoHandle(tau)[0])
-    tau = fminbound(fun, taurange[0], taurange[1], xtol=1e-3, maxfun=maxfun, disp=3)
-    return tau
 ###############################################################################
 # (Xiaojian's end)
 ###############################################################################

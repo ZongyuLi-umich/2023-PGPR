@@ -30,8 +30,8 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
     Ax = A(holocat(x, ref))
 
     lastnrmse = 1
-    T = 3
-    sigmas = np.geomspace(0.03, 0.005, niter)
+    T = 2
+    sigmas = np.geomspace(0.094, 0.0026, niter)
     for iter in range(niter):
         lsize = 128
         for t in range(T):
@@ -48,7 +48,7 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             D1 = np.sqrt(fisher(Ax, b))
             # mu = - (norm(grad_f)**2)/ (norm(np.multiply(Adk, D1))**2) * (sigmas[iter]/0.05)**2
             #mu = - (norm(grad_f)**2) / (norm(np.multiply(Adk, D1))**2 + reg1 * (norm(np.multiply(Tdk, D2))**2))
-            mu = -0.001*(sigmas[iter]/0.05)**2
+            mu = -0.49*(sigmas[iter]**2)
             # mu = -(sigmas[iter]**2)/4
             x += mu * grad_f
             x[(x < 0)] = 0 # set non-negatives to zero

@@ -3,8 +3,8 @@
         "gpu_ids": "0"
     },
     "expargs":{
-        "savedir": "../result/purple-poisson-correctself",
-        "datadir": "../data/purple",
+        "savedir": "../result/nature-poisson-init",
+        "datadir": "../data/nature",
         "init": "Poisson",
         "ncore": 5,
         "imgsize": 128,
@@ -24,7 +24,7 @@
         "pgPROX_scale": 0.5,
         "pgRED_scale": 0.5,
         "pgADMM_rho": 32,
-        "pgPROX_rho": 0.5,
+        "pgPROX_rho": 0.2,
         "pgRED_rho": 100
     },
 

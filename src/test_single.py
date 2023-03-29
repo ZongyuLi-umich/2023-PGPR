@@ -185,14 +185,10 @@ def test_single(i, root_result_dir, dataset, args = {},
         # hyper parameters
         scale = args.pgADMM_scale
         rho = args.pgADMM_rho
-        opt_pnppgadmm_scale = False
-        opt_pnppgadmm_rho = False
-        desp  = '_uiter3_muF'
             
         alg_name = 'pnp_pgadmm'
         exp_dir = f'{results_dir}/{alg_name}'
         check_and_mkdir(exp_dir)
-        # copytree_code(f'{project_root}/src', exp_dir + '/')
         exp_path = f'{exp_dir}/result.mat'
         
         transcript.start(exp_dir + '/logfile.log', mode='a')
@@ -233,13 +229,11 @@ def test_single(i, root_result_dir, dataset, args = {},
         # hyper parameters
         scale = args.pgPROX_scale
         rho   = args.pgPROX_rho
-        opt_pnppgprox_scale = False
-        desp  = ''
+        
             
         alg_name = 'pnp_pgprox'
         exp_dir = f'{results_dir}/{alg_name}'
         check_and_mkdir(exp_dir)
-        # copytree_code(f'{project_root}/src', exp_dir + '/')
         exp_path = f'{exp_dir}/result.mat'
         
         transcript.start(exp_dir + '/logfile.log', mode='a')
@@ -284,13 +278,10 @@ def test_single(i, root_result_dir, dataset, args = {},
         # hyper parameters
         scale = args.pgRED_scale
         rho   = args.pgRED_rho
-        opt_pnppgred_scale = False
-        desp  = ''
             
         alg_name = 'pnp_pgred'
         exp_dir = f'{results_dir}/{alg_name}'
         check_and_mkdir(exp_dir)
-        # copytree_code(f'{project_root}/src', exp_dir + '/')
         exp_path = f'{exp_dir}/result.mat'
         
         transcript.start(exp_dir + '/logfile.log', mode='a')

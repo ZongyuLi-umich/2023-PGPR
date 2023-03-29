@@ -8,7 +8,7 @@ if __name__ == "__main__":
     # Settings 
     ##################################################
     img_to_do     = []
-    exp_to_do     = [] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred', 'pnp_pgred_noise2self', 'pg_score']
+    exp_to_do     = ['pois', 'pnp_pgred_noise2self'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred', 'pnp_pgred_noise2self', 'pg_score']
     dataset_name  = 'virusimg'
     project_root  = '/home/lizongyu/PycharmProjects/2023-PGPR'
     # params_config = f'{project_root}//src/config/params_{dataset_name}.txt'

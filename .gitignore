@@ -129,4 +129,7 @@ dmypy.json
 .pyre/
 
 /data
+/result
+/pnpmodels
+/scoremodels
 /src/*.ipynb

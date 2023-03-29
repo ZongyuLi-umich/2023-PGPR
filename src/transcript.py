@@ -1,11 +1,6 @@
 """
+author: Xiaojian Xu, 2018
 Transcript - direct print output to a file, in addition to terminal.
-Usage:
-    import transcript
-    transcript.start('logfile.log')
-    print("inside file")
-    transcript.stop()
-    print("outside file")
 """
 
 import sys
