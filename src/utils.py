@@ -195,6 +195,13 @@ def make_summary(root_result_dir, img_to_do, exp_to_do):
         print(f'alg name: {key} || mean: {np.mean(all_data[key]):.4f} || std: {np.std(all_data[key]):.4f} || max: {np.amax(all_data[key]):.4f} || min: {np.amin(all_data[key]):.4f}')
     transcript.stop()
     
+def copytree_code(src_path, save_path):
+    max_code_save = 100
+    for i in range(max_code_save):
+        code_path = save_path + 'code%d/' % i
+        if not os.path.exists(code_path):
+            shutil.copytree(src=src_path, dst=code_path)
+            break
     
 if __name__ == "__main__":
     parser = config_parser()

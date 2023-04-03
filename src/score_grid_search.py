@@ -77,9 +77,9 @@ def grid_search_single(i, kwargs, args, model_score):
     check_and_mkdir(exp_dir)
     transcript.start(exp_dir + '/logfile.log', mode='a')
     iteration = random.randint(2, 4) # 2-4
-    sigma_max = random.randint(20, 100) / 1000 # 0.02-0.1
-    sigma_min = random.randint(10, 190) / 10000 # 0.001-0.019
-    scale = random.randint(100, 500) / 1000 # step size: 0.1-0.5
+    sigma_max = random.randint(20, 150) / 1000 # 0.02-0.15
+    sigma_min = random.randint(1, 190) / 10000 # 0.0001-0.019
+    scale = random.randint(100, 1000) / 1000 # step size: 0.1-1
     print('###########################################################')
     print(f'T: {iteration} || sigma_max: {sigma_max:.4f} || sigma_min: {sigma_min:.4f} || scale: {scale:.4f}')
     print('###########################################################')
@@ -120,8 +120,8 @@ def find_best_run(root_result_dir, num_trials):
     transcript.stop()
     
 if __name__ == "__main__":
-    img_id   = 9
-    dataset_name  = 'virusimg'
+    img_id   = 0
+    dataset_name  = 'natureimg'
     project_root  = '/home/lizongyu/PycharmProjects/2023-PGPR'
     # params_config = f'{project_root}//src/config/params_{dataset_name}.txt'
     config  = f'{project_root}/src/config/config.json'
@@ -186,7 +186,7 @@ if __name__ == "__main__":
                                 **kwargs)
     kwargs['x0'] = xout_pois
     print(f'[Old]: re-init x0 from result_pois.')
-    num_trials = 1000
+    num_trials = 150
     Parallel(n_jobs=args.ncore)(delayed(grid_search_single)(i=i,
                                             kwargs=kwargs, 
                                             args=args, 

@@ -3,9 +3,12 @@
         "gpu_ids": "0"
     },
     "expargs":{
-        "savedir": "../result/nature-poisson-init",
-        "datadir": "../data/nature",
+        "savedir": "../result/purple-poisson-score-fgm",
+        "datadir": "../data/purple",
+        "dataset_name": "virusimg",
         "init": "Poisson",
+        "img_to_do": [],
+        "exp_to_do": ["pois", "pg_score"], 
         "ncore": 5,
         "imgsize": 128,
         "scaleSYS": 0.03,
@@ -19,7 +22,7 @@
         "pgADMM_niter": 20,
         "pgPROX_niter": 20,
         "pgRED_niter": 20,
-        "pgSCORE_niter": 20,
+        "pgSCORE_niter": 10,
         "pgADMM_scale": 0.5,
         "pgPROX_scale": 0.5,
         "pgRED_scale": 0.5,

@@ -7,9 +7,9 @@ if __name__ == "__main__":
     ##################################################
     # Settings 
     ##################################################
-    img_to_do     = []
-    exp_to_do     = ['pois', 'pnp_pgred_noise2self'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred', 'pnp_pgred_noise2self', 'pg_score']
-    dataset_name  = 'virusimg'
+    # img_to_do     = []
+    # exp_to_do     = ['pois', 'pg_score'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred', 'pnp_pgred_noise2self', 'pg_score']
+    # dataset_name  = 'natureimg'
     project_root  = '/home/lizongyu/PycharmProjects/2023-PGPR'
     # params_config = f'{project_root}//src/config/params_{dataset_name}.txt'
     config  = f'{project_root}/src/config/config.json'
@@ -30,6 +30,10 @@ if __name__ == "__main__":
     with open(config) as File:
         allconfig = json.load(File)
         
+    ######################### load expargs ##########################
+    args = Dict2Class(allconfig['expargs'])
+    print('savedir: ', args.savedir)
+    copytree_code(os.getcwd(), f'{args.savedir}/src/')
     ##################################################
     # init the gpu usages
     ##################################################
@@ -43,7 +47,7 @@ if __name__ == "__main__":
     ##################################################
     # load config for pnp
     pnp_config  = allconfig['methods']['denoise']
-    dataset_pnp_config = pnp_config[dataset_name]
+    dataset_pnp_config = pnp_config[args.dataset_name]
     dnn_pnp_name       = dataset_pnp_config['dnn_name']
     sgm_pnp_name       = dataset_pnp_config['sgm_name']
     model_pnp_path     = dataset_pnp_config['model_path'][sgm_pnp_name]
@@ -58,15 +62,13 @@ if __name__ == "__main__":
     print('model pnp # of params: ', count_parameters(model_pnp))
     
     ########### load model for score function ############
-    model_score_path = allconfig['methods']['score'][dataset_name]['model_path']
+    model_score_path = allconfig['methods']['score'][args.dataset_name]['model_path']
     model_score = Unet(dim=allconfig['networks']['unet']['dim'])
     model_score.load_state_dict(torch.load(model_score_path, map_location='cpu'))
     model_score.to(device)
     print('model score # of params: ', count_parameters(model_score))
 
-    ######################### load expargs ##########################
-    args = Dict2Class(allconfig['expargs'])
-    print('savedir: ', args.savedir)
+    
     # model.eval()
 
     ############################################################
@@ -74,5 +76,5 @@ if __name__ == "__main__":
     ############################################################
     # with torch.no_grad():
     test_all(args=args, model_pnp=model_pnp, model_score=model_score, 
-             exp_to_do=exp_to_do, img_to_do=img_to_do)   
+             exp_to_do=args.exp_to_do, img_to_do=args.img_to_do)   
         

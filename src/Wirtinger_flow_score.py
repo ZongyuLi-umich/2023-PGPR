@@ -30,8 +30,11 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
     Ax = A(holocat(x, ref))
 
     lastnrmse = 1
-    T = 2
+    T = 2  # set T=2 for purple dataset
     sigmas = np.geomspace(0.094, 0.0026, niter)
+    tn = 1 # OGM
+    z = np.copy(x)
+    # sigmas = np.geomspace(0.04, 0.0069, niter)
     for iter in range(niter):
         lsize = 128
         for t in range(T):
@@ -44,14 +47,28 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             #grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + reg1 * diff2d_adj(grad_huber_v(Tx, reg2), sn, sn)
             grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + 1*scorepart
             
-            Adk = A(holocat(grad_f, np.zeros_like(grad_f)))
-            D1 = np.sqrt(fisher(Ax, b))
+            # Adk = A(holocat(grad_f, np.zeros_like(grad_f)))
+            # D1 = np.sqrt(fisher(Ax, b))
             # mu = - (norm(grad_f)**2)/ (norm(np.multiply(Adk, D1))**2) * (sigmas[iter]/0.05)**2
             #mu = - (norm(grad_f)**2) / (norm(np.multiply(Adk, D1))**2 + reg1 * (norm(np.multiply(Tdk, D2))**2))
-            mu = -0.49*(sigmas[iter]**2)
+            mu = -0.08*(sigmas[iter]**2) # set to -0.49 for purple dataset
             # mu = -(sigmas[iter]**2)/4
-            x += mu * grad_f
-            x[(x < 0)] = 0 # set non-negatives to zero
+            #################### FGM updates #####################
+            z_old = np.copy(z)
+            z = x + (mu * grad_f) # for langevin dynamics: + np.sqrt(-2*mu)*np.random.randn(len(x))
+            tn_old = np.copy(tn)
+            tn = 1/2 * (1 + np.sqrt(1 + 4*(tn**2)))
+            x = z + ((tn_old - 1) / tn * (z - z_old))
+            #################### OGM updates #####################
+            # z_old = np.copy(z)
+            # z = x + (mu * grad_f) # for langevin dynamics: + np.sqrt(-2*mu)*np.random.randn(len(x))
+            # tn_old = np.copy(tn)
+            # tn = 1/2 * (1 + np.sqrt(1 + 4*(tn**2)))
+            # x = z + ((1 + tn_old / tn) / mu * grad_f) + ((tn_old - 1) / tn * (z - z_old))
+            #################### gradient descent ###################
+            # x += (mu * grad_f) # gradient descent
+            # set non-negatives to zero
+            x[(x < 0)] = 0 
             Ax = A(holocat(x, ref))
 
         out.append(nrmse(x, xtrue))
