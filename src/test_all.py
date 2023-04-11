@@ -11,8 +11,8 @@ from joblib import Parallel, delayed
 from test_single import test_single
 
     
-def test_all(args = {}, model_pnp = None, model_score=None,
-            exp_to_do = [], img_to_do=[]):
+def test_all(args = {}, model_pnp = None, model_score=None, 
+             model_ddpm = None, exp_to_do = [], img_to_do=[]):
     
     # pass empty list to test on all images
     root_result_dir = f'{args.savedir}'
@@ -30,7 +30,10 @@ def test_all(args = {}, model_pnp = None, model_score=None,
         img_to_do = range(len(dataset.data['xtrue']))
     
     if not exp_to_do:
-        exp_to_do = ['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred', 'pnp_pgred_noise2self', 'pg_score']
+        exp_to_do = ['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 
+                     'pnp_pgred', 'pnp_pgred_noise2self', 'gau_score',
+                     'pois_score', 'pg_score', 'gau_ddpm', 'pois_ddpm',
+                     'pg_ddpm']
     
     
     Parallel(n_jobs=args.ncore)(delayed(test_single)(i=i,
@@ -39,6 +42,7 @@ def test_all(args = {}, model_pnp = None, model_score=None,
                                             args = args, 
                                             model_pnp = model_pnp, 
                                             model_score=model_score,
+                                            model_ddpm = model_ddpm,
                                             exp_to_do=exp_to_do) for i in img_to_do)
             
     # make summary

@@ -68,6 +68,12 @@ if __name__ == "__main__":
     model_score.to(device)
     print('model score # of params: ', count_parameters(model_score))
 
+    ########### load model for ddpm ############
+    model_ddpm_path = allconfig['methods']['ddpm'][args.dataset_name]['model_path']
+    model_ddpm = Unet(dim=allconfig['networks']['unet']['dim'])
+    model_ddpm.load_state_dict(torch.load(model_ddpm_path, map_location='cpu'))
+    model_ddpm.to(device)
+    print('model ddpm # of params: ', count_parameters(model_ddpm))
     
     # model.eval()
 
@@ -76,5 +82,5 @@ if __name__ == "__main__":
     ############################################################
     # with torch.no_grad():
     test_all(args=args, model_pnp=model_pnp, model_score=model_score, 
-             exp_to_do=args.exp_to_do, img_to_do=args.img_to_do)   
+             model_ddpm=model_ddpm, exp_to_do=args.exp_to_do, img_to_do=args.img_to_do)   
         

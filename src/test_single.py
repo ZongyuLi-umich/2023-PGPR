@@ -11,8 +11,69 @@ import scipy.io as sio
 import transcript
 
 
+def run_wo_init(results_dir, alg_name, model_pnp, model_score, 
+                model_ddpm, args, kwargs):
+    exp_dir = f'{results_dir}/{alg_name}'
+    check_and_mkdir(exp_dir)
+    exp_path = f'{exp_dir}/result.mat'
+    transcript.start(exp_dir + '/logfile.log', mode='a')
+    print('\n###########################################################')
+    print(f'{alg_name}')
+    print('###########################################################')
+    try: 
+        result = sio.loadmat(exp_path)
+        xout = result['xout'].squeeze()
+        cout  = result['cout'].squeeze()
+        print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
+    except:
+        print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')
+        xout, cout = run_alg(alg=alg_name, args=args, model_pnp = model_pnp, 
+                             model_score=model_score, model_ddpm=model_ddpm, 
+                            verbose=True, **kwargs)
+        result = {'xout': xout, 'cout': cout}
+        sio.savemat(f'{exp_path}', result)
+    print(f'nrmse of {alg_name}: ', cout[-1])
+    transcript.stop()
+
+
+def run_with_init(results_dir, alg_name, model_pnp, model_score, 
+                  model_ddpm, args, kwargs):
+    exp_dir = f'{results_dir}/{alg_name}'
+    check_and_mkdir(exp_dir)
+    exp_path = f'{exp_dir}/result.mat'
+    
+    transcript.start(exp_dir + '/logfile.log', mode='a')
+    print('\n###########################################################')
+    print(f'{alg_name}')
+    print('###########################################################')
+        
+    if args.init == 'Gaussian':
+        kwargs['x0'] = sio.loadmat(f'{results_dir}/gau/result.mat')['xout'].squeeze()
+        print(f'[Old]: re-init x0 from result_gau.')
+    elif args.init == 'Poisson':
+        kwargs['x0'] = sio.loadmat(f'{results_dir}/pois/result.mat')['xout'].squeeze()
+        print(f'[Old]: re-init x0 from result_pois.')
+    else:
+        return NotImplementedError
+
+    try: 
+        result = sio.loadmat(exp_path)
+        xout = result['xout'].squeeze()
+        cout  = result['cout'].squeeze()
+        print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
+    except:
+        print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
+        xout, cout = run_alg(alg=alg_name, args=args, model_pnp = model_pnp, 
+                             model_score=model_score, model_ddpm=model_ddpm, 
+                            verbose=True, **kwargs)
+        result = {'xout': xout, 'cout': cout}
+        sio.savemat(f'{exp_path}', result)
+    print(f'nrmse of {alg_name}: ', cout[-1])
+    transcript.stop()
+    
+    
 def test_single(i, root_result_dir, dataset, args = {}, 
-                model_pnp = None, model_score=None,
+                model_pnp = None, model_score=None, model_ddpm=None,
                 exp_to_do = []):
     #  make folders
     results_dir = f'{root_result_dir}/{i}'
@@ -49,365 +110,16 @@ def test_single(i, root_result_dir, dataset, args = {},
                 'xtrue': init_data['xtrue'].squeeze(),
                 }
     
-    if 'gau' in  exp_to_do:
-        alg_name = 'gau'
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        exp_path = f'{exp_dir}/result.mat'
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-            
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')
-            xout, cout = run_alg(alg=alg_name, 
-                                        sigma=0, 
-                                        delta=0, 
-                                        niter=args.gau_niter, 
-                                        **kwargs)
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
-        xout_gau = xout
-        
-    
-    if 'pois' in  exp_to_do:  
-        alg_name = 'pois'
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        exp_path = f'{exp_dir}/result.mat'
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
-            xout, cout = run_alg(alg=alg_name, 
-                                sigma=0, 
-                                delta=0, 
-                                niter=args.pois_niter, 
-                                **kwargs)
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
-        xout_pois = xout
-        
-    if 'pg' in  exp_to_do: 
-        alg_name = 'pg'
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        exp_path = f'{exp_dir}/result.mat'
-        
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-            
-        if args.init == 'Gaussian':
-            kwargs['x0'] = xout_gau
-            print(f'[Old]: re-init x0 from result_gau.')
-        elif args.init == 'Poisson':
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
+    for alg_name in exp_to_do:
+        if alg_name in ['gau', 'pois']:
+            run_wo_init(results_dir, alg_name, model_pnp, 
+                        model_score, model_ddpm, args, kwargs)
+        elif alg_name in ['pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 
+                     'pnp_pgred', 'pnp_pgred_noise2self', 'gau_score',
+                     'pois_score', 'pg_score', 'gau_ddpm', 'pois_ddpm',
+                     'pg_ddpm']:
+            run_with_init(results_dir, alg_name, model_pnp, 
+                        model_score, model_ddpm, args, kwargs)
         else:
-            return NotImplementedError
-
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
-            xout, cout = run_alg(alg=alg_name, 
-                                sigma=args.sigma, 
-                                delta=args.delta, 
-                                niter=args.pg_niter, 
-                                **kwargs)
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
-    
-    if 'pg_tv' in  exp_to_do: 
-        alg_name = 'pg_tv' 
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        exp_path = f'{exp_dir}/result.mat'
-        
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-            
-        if args.init == 'Gaussian':
-            kwargs['x0'] = xout_gau
-            print(f'[Old]: re-init x0 from result_gau.')
-        elif args.init == 'Poisson':
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
-        else:
-            return NotImplementedError
-
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
-            xout, cout = run_alg(alg=alg_name, 
-                                sigma=args.sigma, 
-                                delta=args.delta, 
-                                niter=args.pgTV_niter, 
-                                reg1=args.regTV, 
-                                reg2=0.1, 
-                                **kwargs)
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
-        
-    if 'pnp_pgadmm' in  exp_to_do: 
-        # hyper parameters
-        scale = args.pgADMM_scale
-        rho = args.pgADMM_rho
-            
-        alg_name = 'pnp_pgadmm'
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        exp_path = f'{exp_dir}/result.mat'
-        
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-            
-        if args.init == 'Gaussian':
-            kwargs['x0'] = xout_gau
-            print(f'[Old]: re-init x0 from result_gau.')
-        elif args.init == 'Poisson':
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
-        else:
-            return NotImplementedError
-            
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:                
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
-            xout, cout = run_alg(alg=alg_name, 
-                                sigma=args.sigma, 
-                                delta=args.delta, 
-                                niter=args.pgADMM_niter, 
-                                model=model_pnp, 
-                                scale = scale,
-                                rho = rho,
-                                **kwargs)
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
-    
-    if 'pnp_pgprox' in  exp_to_do: 
-        # hyper parameters
-        scale = args.pgPROX_scale
-        rho   = args.pgPROX_rho
-        
-            
-        alg_name = 'pnp_pgprox'
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        exp_path = f'{exp_dir}/result.mat'
-        
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-            
-        if args.init == 'Gaussian':
-            kwargs['x0'] = xout_gau
-            print(f'[Old]: re-init x0 from result_gau.')
-        elif args.init == 'Poisson':
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
-        else:
-            return NotImplementedError
-            
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:
-            ############################################
-            # run
-            ############################################
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
-            xout, cout = run_alg(alg=alg_name, 
-                                sigma=args.sigma, 
-                                delta=args.delta, 
-                                niter=args.pgPROX_niter, 
-                                model=model_pnp, 
-                                scale = scale,
-                                rho = rho,
-                                **kwargs)
-
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
-    
-    if 'pnp_pgred' in  exp_to_do: 
-        # hyper parameters
-        scale = args.pgRED_scale
-        rho   = args.pgRED_rho
-            
-        alg_name = 'pnp_pgred'
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        exp_path = f'{exp_dir}/result.mat'
-        
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-            
-        if args.init == 'Gaussian':
-            kwargs['x0'] = xout_gau
-            print(f'[Old]: re-init x0 from result_gau.')
-        elif args.init == 'Poisson':
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
-        else:
-            return NotImplementedError
-            
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:
-            ############################################
-            # run
-            ############################################
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
-            xout, cout = run_alg(alg=alg_name, 
-                                sigma=args.sigma, 
-                                delta=args.delta, 
-                                niter=args.pgRED_niter, 
-                                model=model_pnp, 
-                                scale = scale,
-                                rho = rho,
-                                **kwargs)
-
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
-    
-    if 'pnp_pgred_noise2self' in  exp_to_do: 
-        # hyper parameters
-        scale = args.pgRED_scale
-        rho   = args.pgRED_rho
-        opt_pnppgred_scale = False
-        desp  = ''
-            
-        alg_name = 'pnp_pgred_noise2self'
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        # copytree_code(f'{project_root}/src', exp_dir + '/')
-        exp_path = f'{exp_dir}/result.mat'
-        
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-            
-        if args.init == 'Gaussian':
-            kwargs['x0'] = xout_gau
-            print(f'[Old]: re-init x0 from result_gau.')
-        elif args.init == 'Poisson':
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
-        else:
-            return NotImplementedError
-            
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:
-            ############################################
-            # run
-            ############################################
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
-            xout, cout = run_alg(alg=alg_name, 
-                                sigma=args.sigma, 
-                                delta=args.delta, 
-                                niter=args.pgRED_niter, 
-                                model=model_pnp, 
-                                scale = scale,
-                                rho = rho,
-                                **kwargs)
-
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
-        
-    if 'pg_score' in  exp_to_do: 
-        alg_name = 'pg_score'    
-        exp_dir = f'{results_dir}/{alg_name}'
-        check_and_mkdir(exp_dir)
-        exp_path = f'{exp_dir}/result.mat'
-            
-        transcript.start(exp_dir + '/logfile.log', mode='a')
-        print('\n###########################################################')
-        print(f'{alg_name}')
-        print('###########################################################')
-            
-        if args.init == 'Gaussian':
-            kwargs['x0'] = xout_gau
-            print(f'[Old]: re-init x0 from result_gau.')
-        elif args.init == 'Poisson':
-            kwargs['x0'] = xout_pois
-            print(f'[Old]: re-init x0 from result_pois.')
-        else:
-            return NotImplementedError
-            
-
-        try: 
-            result = sio.loadmat(exp_path)
-            xout = result['xout'].squeeze()
-            cout  = result['cout'].squeeze()
-            print(f'[Old]: result of [{alg_name}] loaded from {exp_path}.')
-        except:
-            print(f'[New]: result of [{alg_name}] running to save to {exp_path}.')  
-            xout, cout = run_alg(alg=alg_name, 
-                                        sigma=args.sigma, 
-                                        delta=args.delta, 
-                                        niter=args.pgSCORE_niter, 
-                                        model=model_score, 
-                                        **kwargs)
-            result = {'xout': xout, 'cout': cout}
-            sio.savemat(f'{exp_path}', result)
-        print(f'nrmse of {alg_name}: ', cout[-1])
-        transcript.stop()
+            raise NotImplementedError
+                

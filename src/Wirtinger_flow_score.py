@@ -16,9 +16,13 @@ def get_grad(sigma, delta):
             return 2 * v * (1 - yi / (abs2(v) + bi))
     def fisher(vi, bi): return 4 * abs2(vi) / (abs2(vi) + bi)
     return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
+
+def grad_gau(v, yi, bi): return 4 * (abs2(v) + bi - yi) * v
+def grad_pois(v, yi, bi): return 2 * v * (1 - yi / (abs2(v) + bi))
         
 def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta, 
-                            niter, xtrue, model, verbose=True):
+                            niter, xtrue, model, gradhow = 'pois',
+                            verbose=True):
     M = len(y)
     N = len(x0)
     out = []
@@ -34,6 +38,8 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
     sigmas = np.geomspace(0.094, 0.0026, niter)
     tn = 1 # OGM
     z = np.copy(x)
+    grad_gau_v = np.vectorize(grad_gau)
+    grad_pois_v = np.vectorize(grad_pois)
     # sigmas = np.geomspace(0.04, 0.0069, niter)
     for iter in range(niter):
         lsize = 128
@@ -45,7 +51,14 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05
             scorepart = np.squeeze(scorepart)
             #grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + reg1 * diff2d_adj(grad_huber_v(Tx, reg2), sn, sn)
-            grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + 1*scorepart
+            if gradhow == 'gau':
+                grad_f = np.real(At(grad_gau_v(Ax, y, b)))[:N] + 1*scorepart
+            elif gradhow == 'pois':
+                grad_f = np.real(At(grad_pois_v(Ax, y, b)))[:N] + 1*scorepart
+            elif gradhow == 'pg':
+                grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + 1*scorepart
+            else:
+                raise NotImplementedError
             
             # Adk = A(holocat(grad_f, np.zeros_like(grad_f)))
             # D1 = np.sqrt(fisher(Ax, b))
