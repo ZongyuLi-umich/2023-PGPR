@@ -61,7 +61,7 @@ def Wirtinger_flow_score_ddpm(A, At, y, b, x0, ref, sigma, delta,
         else:
             z = np.zeros(lsize**2)
         sigma_t = 0.01
-        #sigma_t = math.sqrt(betas[t-1])*0 #one possible choice
+        # sigma_t = math.sqrt(betas[t-1]) #one possible choice
 
         x = (x - (1-alphas[t-1])/math.sqrt(1-alphabars[t-1]) * epspart)/math.sqrt(alphas[t-1]) + sigma_t * z
         if negone:

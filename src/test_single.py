@@ -116,8 +116,9 @@ def test_single(i, root_result_dir, dataset, args = {},
                         model_score, model_ddpm, args, kwargs)
         elif alg_name in ['pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 
                      'pnp_pgred', 'pnp_pgred_noise2self', 'gau_score',
-                     'pois_score', 'pg_score', 'gau_ddpm', 'pois_ddpm',
-                     'pg_ddpm']:
+                     'pois_score', 'pg_score', 'gau_score_apg',
+                     'pois_score_apg', 'pg_score_apg',
+                     'gau_ddpm', 'pois_ddpm', 'pg_ddpm']:
             run_with_init(results_dir, alg_name, model_pnp, 
                         model_score, model_ddpm, args, kwargs)
         else:

@@ -8,6 +8,7 @@ from pnp_pgprox import *
 from pnp_pgred import *
 from pnp_pgred_noise2self import *
 from Wirtinger_flow_ddpm import *
+from Wirtinger_flow_score_apg import *
 
 
 def run_alg(alg, args, model_pnp = None, model_score=None, model_ddpm=None, 
@@ -177,6 +178,48 @@ def run_alg(alg, args, model_pnp = None, model_score=None, model_ddpm=None,
                                        model = model_score,
                                        gradhow = 'pg',
                                        verbose = verbose)
+    elif alg == 'gau_score_apg':
+        xout, cout = Wintinger_flow_score_apg(A=kwargs['A'], 
+                                            At=kwargs['At'], 
+                                            y=kwargs['y'], 
+                                            b=kwargs['b'], 
+                                            x0=kwargs['x0'], 
+                                            ref=kwargs['ref'], 
+                                            sigma=args.sigma, 
+                                            delta=args.delta, 
+                                            niter=args.pgSCORE_niter, 
+                                            xtrue=kwargs['xtrue'], 
+                                            model = model_score,
+                                            gradhow = 'gau',
+                                            verbose = verbose)
+    elif alg == 'pois_score_apg':
+        xout, cout = Wintinger_flow_score_apg(A=kwargs['A'], 
+                                            At=kwargs['At'], 
+                                            y=kwargs['y'], 
+                                            b=kwargs['b'], 
+                                            x0=kwargs['x0'], 
+                                            ref=kwargs['ref'], 
+                                            sigma=args.sigma, 
+                                            delta=args.delta, 
+                                            niter=args.pgSCORE_niter, 
+                                            xtrue=kwargs['xtrue'], 
+                                            model = model_score,
+                                            gradhow = 'pois',
+                                            verbose = verbose)
+    elif alg == 'pg_score_apg':
+        xout, cout = Wintinger_flow_score_apg(A=kwargs['A'], 
+                                            At=kwargs['At'], 
+                                            y=kwargs['y'], 
+                                            b=kwargs['b'], 
+                                            x0=kwargs['x0'], 
+                                            ref=kwargs['ref'], 
+                                            sigma=args.sigma, 
+                                            delta=args.delta, 
+                                            niter=args.pgSCORE_niter, 
+                                            xtrue=kwargs['xtrue'], 
+                                            model = model_score,
+                                            gradhow = 'pg',
+                                            verbose = verbose)
     elif alg == 'gau_ddpm':
         xout, cout = Wirtinger_flow_score_ddpm(A=kwargs['A'], 
                                             At=kwargs['At'], 

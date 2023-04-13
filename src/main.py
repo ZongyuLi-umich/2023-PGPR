@@ -3,7 +3,7 @@ from model2 import DnCNN, Denoise
 from test_all import *
 from model2 import Unet
 
-if __name__ == "__main__":
+def run_config(path):
     ##################################################
     # Settings 
     ##################################################
@@ -12,7 +12,7 @@ if __name__ == "__main__":
     # dataset_name  = 'natureimg'
     project_root  = '/home/lizongyu/PycharmProjects/2023-PGPR'
     # params_config = f'{project_root}//src/config/params_{dataset_name}.txt'
-    config  = f'{project_root}/src/config/config.json'
+    config  = f'{project_root}/{path}'
     
     ##################################################
     # reproducibility
@@ -83,4 +83,15 @@ if __name__ == "__main__":
     # with torch.no_grad():
     test_all(args=args, model_pnp=model_pnp, model_score=model_score, 
              model_ddpm=model_ddpm, exp_to_do=args.exp_to_do, img_to_do=args.img_to_do)   
-        
+
+if __name__ == "__main__":
+    config1 = 'src/config/config-0.020.json'
+    config2 = 'src/config/config-0.025.json'
+    config3 = 'src/config/config-0.030.json'
+    config4 = 'src/config/config-0.035.json'
+    config5 = 'src/config/config-0.040.json'
+    run_config(config1)
+    run_config(config2)
+    run_config(config3)
+    run_config(config4)
+    run_config(config5)
