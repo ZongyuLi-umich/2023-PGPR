@@ -5,7 +5,7 @@ from numpy.linalg import norm
 from eval_metric import *
 from tqdm import tqdm
 
-def get_grad(gradhow):
+def get_grad_gau_pois(gradhow):
     if gradhow == 'gau':
         def phi(v, yi, bi): return abs2(abs2(v) + bi - yi)
         def grad_phi(v, yi, bi): return 4 * (abs2(v) + bi - yi) * v
@@ -25,7 +25,7 @@ def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, r
     sn = np.sqrt(N).astype(int)
     out.append(nrmse(x0, xtrue))
     x = np.copy(x0)
-    phi, grad_phi, fisher = get_grad(gradhow)
+    phi, grad_phi, fisher = get_grad_gau_pois(gradhow)
     huber_v = np.vectorize(huber)
     grad_huber_v = np.vectorize(grad_huber)
     curv_huber_v = np.vectorize(curv_huber)

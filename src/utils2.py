@@ -141,6 +141,17 @@ def holocat(x, ref):
     concated = np.hstack((x_reshaped, np.zeros_like(x_reshaped), ref_reshaped)) # holographic separation condition
     return vec(concated)
 
+def get_grad(sigma, delta):
+    def phi(v, yi, bi): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
+    def grad_phi(v, yi, bi): 
+        if yi < np.minimum(100, 100/(sigma**2)):
+            u = abs2(v) + bi
+            return 2 * v * grad_phi1(u, yi, sigma, delta)
+        else:
+            return 2 * v * (1 - yi / (abs2(v) + bi))
+    def fisher(vi, bi): return 4 * abs2(vi) / (abs2(vi) + bi)
+    return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
+
 if __name__ == "__main__":
     # test fft
     N = 64

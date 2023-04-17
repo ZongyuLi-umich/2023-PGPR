@@ -6,16 +6,6 @@ from tqdm import tqdm
 import torch
 from eval_metric import *
 
-def get_grad(sigma, delta):
-    def phi(v, yi, bi): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
-    def grad_phi(v, yi, bi): 
-        if yi < 100:
-            u = abs2(v) + bi
-            return 2 * v * grad_phi1(u, yi, sigma, delta)
-        else:
-            return 2 * v * (1 - yi / (abs2(v) + bi))
-    def fisher(vi, bi): return 4 * abs2(vi) / (abs2(vi) + bi)
-    return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
 
 def grad_gau(v, yi, bi): return 4 * (abs2(v) + bi - yi) * v
 def grad_pois(v, yi, bi): return 2 * v * (1 - yi / (abs2(v) + bi))

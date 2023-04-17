@@ -4,17 +4,7 @@ from utils2 import *
 from numpy.linalg import norm
 from tqdm import tqdm
 from eval_metric import *
-
-def get_grad(sigma, delta):
-    def phi(v, yi, bi): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
-    def grad_phi(v, yi, bi): 
-        if yi < 100:
-            u = abs2(v) + bi
-            return 2 * v * grad_phi1(u, yi, sigma, delta)
-        else:
-            return 2 * v * (1 - yi / (abs2(v) + bi))
-    def fisher(vi, bi): return 4 * abs2(vi) / (abs2(vi) + bi)
-    return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
+        
         
 def Wintinger_flow_pois_gau(A, At, y, b, x0, ref, sigma, delta, 
                             niter, reg1, reg2, xtrue, verbose = True):

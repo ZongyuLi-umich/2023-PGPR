@@ -12,17 +12,6 @@ from noise2self import Masker
 from torch.nn import MSELoss, L1Loss
 from torch.optim import Adam
 
-def get_grad(sigma, delta):
-    def phi(v, yi, bi): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
-    def grad_phi(v, yi, bi): 
-        if yi < 100:
-            u = abs2(v) + bi
-            return 2 * v * grad_phi1(u, yi, sigma, delta)
-        else:
-            return 2 * v * (1 - yi / (abs2(v) + bi))
-    def fisher(vi, bi): return 4 * abs2(vi) / (abs2(vi) + bi)
-    return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
-
 
 def pnp_pgred_noise2self(A, At, y, b, x0, ref, sigma, delta, niter, 
                          xtrue, model, mu = None, scale = 1, rho=1, verbose=True):

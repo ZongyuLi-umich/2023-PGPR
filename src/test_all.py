@@ -31,9 +31,9 @@ def test_all(args = {}, model_pnp = None, model_score=None,
     
     if not exp_to_do:
         exp_to_do = ['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 
-                     'pnp_pgred', 'pnp_pgred_noise2self', 'gau_score_apg',
+                     'pnp_pgred', 'pnp_pgred_noise2self', 
                      'pois_score_apg', 'pg_score_apg',
-                     'gau_ddpm', 'pois_ddpm', 'pg_ddpm']
+                     'pois_ddpm', 'pg_ddpm']
     
     
     Parallel(n_jobs=args.ncore)(delayed(test_single)(i=i,

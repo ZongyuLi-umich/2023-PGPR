@@ -8,7 +8,7 @@
         "dataset_name": "virusimg",
         "init": "Poisson",
         "img_to_do": [],
-        "exp_to_do": ["pois", "pnp_pgprox", "pois_score_apg", "pg_score_apg", "pois_ddpm", "pg_ddpm"], 
+        "exp_to_do": ["gau", "pg", "pg_tv", "pnp_pgadmm", "pnp_pgred", "pnp_pgred_noise2self"], 
         "ncore": 5,
         "imgsize": 128,
         "scaleSYS": 0.025,

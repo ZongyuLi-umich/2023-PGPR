@@ -3,16 +3,15 @@ from model2 import DnCNN, Denoise
 from test_all import *
 from model2 import Unet
 
-def run_config(path):
+def run_config(config):
     ##################################################
     # Settings 
     ##################################################
     # img_to_do     = []
     # exp_to_do     = ['pois', 'pg_score'] #['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 'pnp_pgred', 'pnp_pgred_noise2self', 'pg_score']
     # dataset_name  = 'natureimg'
-    project_root  = '/home/lizongyu/PycharmProjects/2023-PGPR'
+    # project_root  = '/home/lizongyu/PycharmProjects/2023-PGPR/src'
     # params_config = f'{project_root}//src/config/params_{dataset_name}.txt'
-    config  = f'{project_root}/{path}'
     
     ##################################################
     # reproducibility
@@ -85,13 +84,22 @@ def run_config(path):
              model_ddpm=model_ddpm, exp_to_do=args.exp_to_do, img_to_do=args.img_to_do)   
 
 if __name__ == "__main__":
-    config1 = 'src/config/config-0.020.json'
-    config2 = 'src/config/config-0.025.json'
-    config3 = 'src/config/config-0.030.json'
-    config4 = 'src/config/config-0.035.json'
-    config5 = 'src/config/config-0.040.json'
-    run_config(config1)
-    run_config(config2)
-    run_config(config3)
-    run_config(config4)
-    run_config(config5)
+    directory  = '/home/lizongyu/PycharmProjects/2023-PGPR/src/config'
+    # json_files = []
+    # for filename in os.listdir(directory):
+    #     f = os.path.join(directory, filename)
+    #     # checking if it is a file
+    #     if os.path.isfile(f):
+    #         json_files.append(f)
+    
+    # for i in range(len(json_files)):
+    #     run_config(json_files[i])
+        
+    # config1 = 'config-0.020-sigma-0.5.json'
+    # config2 = 'config-0.020-sigma-0.75.json'
+    config3 = 'config-0.020-sigma-1.25.json'
+    config4 = 'config-0.020-sigma-1.5.json'
+    # run_config(os.path.join(directory, config1))
+    # run_config(os.path.join(directory, config2))
+    run_config(os.path.join(directory, config3))
+    run_config(os.path.join(directory, config4))
