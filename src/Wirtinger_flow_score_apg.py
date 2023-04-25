@@ -31,7 +31,7 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
     
     lastnrmse = 1
     T = 2  # set T=2 for purple dataset
-    alpha = 0.7
+    gamma = 0.5
     sigmas = np.geomspace(0.094, 0.0026, niter)
     tn = 1 # OGM
     x_old = np.copy(x)
@@ -55,12 +55,12 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
     for iter in range(niter):
         lsize = 128
         for t in range(T):
-            netinput = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().cuda()
             network_sigma = torch.from_numpy(np.array([sigmas[iter]])).float().cuda()
-            scorepart = -model.forward(netinput, network_sigma).cpu().detach().numpy().reshape((lsize, lsize))/sigmas[iter]
-            scorepart = scorepart.reshape(-1)
+            netinput_x = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().cuda()
+            scorepart_x = -model.forward(netinput_x, network_sigma).cpu().detach().numpy().reshape((lsize, lsize))/sigmas[iter]
+            scorepart_x = scorepart_x.reshape(-1)
             #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05
-            scorepart = np.squeeze(scorepart)
+            scorepart_x = np.squeeze(scorepart_x)
             #grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + reg1 * diff2d_adj(grad_huber_v(Tx, reg2), sn, sn)
             
             
@@ -75,10 +75,17 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
             w = x + tn_old/tn * (z - x) + (tn_old-1)/tn * (x - x_old) # eqn.(10)
             Aw = A(holocat(w, ref))
             
-            grad_fw = np.real(At(grad_fun(Aw, y, b)))[:N] + 1*scorepart
+            # compute score(w)
+            netinput_w = torch.from_numpy(np.reshape(w, (1,1,lsize,lsize))).float().cuda()
+            scorepart_w = -model.forward(netinput_w, network_sigma).cpu().detach().numpy().reshape((lsize, lsize))/sigmas[iter]
+            scorepart_w = scorepart_w.reshape(-1)
+            #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05
+            scorepart_w = np.squeeze(scorepart_w)
+            
+            grad_fw = np.real(At(grad_fun(Aw, y, b)))[:N] + 1*scorepart_w
             z = w + (mu * grad_fw) # eqn.(11)
             # do multiple realizations of LD and compute the average and std
-            grad_fx = np.real(At(grad_fun(Ax, y, b)))[:N] + 1*scorepart
+            grad_fx = np.real(At(grad_fun(Ax, y, b)))[:N] + 1*scorepart_x
             vv = x + (mu * grad_fx) # eqn.(12) # for langevin dynamics: + np.sqrt(-2*mu)*np.random.randn(len(x))
             
             tn_old = np.copy(tn)
@@ -86,7 +93,7 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
             
             x_old = np.copy(x)
             # eqn.(14)
-            x = alpha * z + (1-alpha) * vv
+            x = gamma * z + (1-gamma) * vv
             # if np.sum(cost_fun(A(holocat(z, ref)), y, b)) <= np.sum(cost_fun(A(holocat(vv, ref)), y, b)):
             #     x = z
             # else:

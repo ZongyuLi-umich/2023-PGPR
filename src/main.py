@@ -85,21 +85,22 @@ def run_config(config):
 
 if __name__ == "__main__":
     directory  = '/home/lizongyu/PycharmProjects/2023-PGPR/src/config'
-    # json_files = []
-    # for filename in os.listdir(directory):
-    #     f = os.path.join(directory, filename)
-    #     # checking if it is a file
-    #     if os.path.isfile(f):
-    #         json_files.append(f)
+    json_files = []
+    for filename in os.listdir(directory):
+        f = os.path.join(directory, filename)
+        # checking if it is a file
+        if os.path.isfile(f):
+            json_files.append(f)
     
-    # for i in range(len(json_files)):
-    #     run_config(json_files[i])
+    for i in range(len(json_files)):
+        run_config(json_files[i])
         
     # config1 = 'config-0.020-sigma-0.5.json'
     # config2 = 'config-0.020-sigma-0.75.json'
-    config3 = 'config-0.020-sigma-1.25.json'
-    config4 = 'config-0.020-sigma-1.5.json'
+    # config3 = 'config-0.020-sigma-1.25.json'
+    # config4 = 'config-0.020-sigma-1.5.json'
+    # config = 'config-apg-w-0.030.json'
     # run_config(os.path.join(directory, config1))
     # run_config(os.path.join(directory, config2))
-    run_config(os.path.join(directory, config3))
-    run_config(os.path.join(directory, config4))
+    # run_config(os.path.join(directory, config))
+    # run_config(os.path.join(directory, config4))

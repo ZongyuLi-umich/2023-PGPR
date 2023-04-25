@@ -504,6 +504,6 @@ class Denoise(nn.Module):
 if __name__ == "__main__":
     model = Unet(dim = 64)
 
-    #x = model.forward(torch.ones(5,1,64,64), 696969)
-    x = model.forward(torch.ones(5,1,64,64))
+    x = model.forward(torch.ones(5,1,64,64), [1.0,0.5,0.1])
+    # x = model.forward(torch.ones(5,1,64,64))
     print(x.shape)
