@@ -62,7 +62,7 @@ def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, r
         else:
             raise NotImplementedError
         x += mu * grad_f
-        x[(x < 0)] = 0 # set non-negatives to zero
+        x = np.clip(x, 0, 1) # set non-negatives to zero
         Ax = A(holocat(x, ref))
         Tx = diff2d_forw(x, sn, sn)
         out.append(nrmse(x, xtrue))

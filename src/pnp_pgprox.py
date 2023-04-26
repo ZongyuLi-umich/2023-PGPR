@@ -34,6 +34,7 @@ def pnp_pgprox(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, mu = Non
         x1 = np.maximum(0, x + mu * grad_x)
         x2 = denoise(x1, model, scale, sn=128)  
         x = (1-rho) * x1 + rho * x2
+        x = np.clip(x, 0, 1)
               
         Ax = A(holocat(x, ref))
         out.append(nrmse(x, xtrue))

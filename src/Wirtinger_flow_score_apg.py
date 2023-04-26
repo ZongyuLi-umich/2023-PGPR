@@ -73,6 +73,7 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
             #################### FGM updates #####################
             
             w = x + tn_old/tn * (z - x) + (tn_old-1)/tn * (x - x_old) # eqn.(10)
+            w = np.clip(w, 0, 1)
             Aw = A(holocat(w, ref))
             
             # compute score(w)
@@ -98,7 +99,7 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
             #     x = z
             # else:
             #     x = vv
-            x[(x < 0)] = 0 
+            x = np.clip(x, 0, 1)
             Ax = A(holocat(x, ref))
 
         out.append(nrmse(x, xtrue))

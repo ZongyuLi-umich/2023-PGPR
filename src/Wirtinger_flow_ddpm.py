@@ -71,7 +71,7 @@ def Wirtinger_flow_score_ddpm(A, At, y, b, x0, ref, sigma, delta,
         mu = -(norm(grad_f)**2) / (norm(np.multiply(Adk, D1))**2)
         # update x
         x += mu * grad_f
-        x[(x < 0)] = 0 # set non-negatives to zero
+        x = np.clip(x, 0, 1) # set non-negatives to zero
         # update Ax
         Ax = A(holocat(x, ref))
 

@@ -31,7 +31,7 @@ def Wintinger_flow_pois_gau(A, At, y, b, x0, ref, sigma, delta,
         D2 = np.sqrt(curv_huber_v(Tx, reg2))
         mu = - (norm(grad_f)**2) / (norm(np.multiply(Adk, D1))**2 + reg1 * (norm(np.multiply(Tdk, D2))**2))
         x += mu * grad_f
-        x[(x < 0)] = 0 # set non-negatives to zero
+        x = np.clip(x, 0, 1) # set non-negatives to zero
         Ax = A(holocat(x, ref))
         Tx = diff2d_forw(x, sn, sn)
         out.append(nrmse(x, xtrue))

@@ -3,12 +3,12 @@
         "gpu_ids": "0"
     },
     "expargs":{
-        "savedir": "../result/purple-poisson-score-fgm-apg-scale-0.0275-apg-w-gamma-0.5",
+        "savedir": "../result/purple-poisson-score-fgm-apg-scale-0.0275-clip",
         "datadir": "../data/purple",
         "dataset_name": "virusimg",
         "init": "Poisson",
         "img_to_do": [],
-        "exp_to_do": ["pois", "pois_score_apg", "pg_score_apg", "pois_ddpm", "pg_ddpm"], 
+        "exp_to_do": [], 
         "ncore": 5,
         "imgsize": 128,
         "scaleSYS": 0.0275,
