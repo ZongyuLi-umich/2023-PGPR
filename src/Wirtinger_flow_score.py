@@ -34,8 +34,8 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
     for iter in range(niter):
         lsize = 128
         for t in range(T):
-            netinput = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().cuda()
-            network_sigma = torch.from_numpy(np.array([sigmas[iter]])).float().cuda()
+            netinput = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().to(next(model.parameters()).device)
+            network_sigma = torch.from_numpy(np.array([sigmas[iter]])).float().to(next(model.parameters()).device)
             scorepart = -model.forward(netinput, network_sigma).cpu().detach().numpy().reshape((lsize, lsize))/sigmas[iter]
             scorepart = scorepart.reshape(-1)
             #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05
@@ -57,12 +57,12 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             mu = -0.08*(sigmas[iter]**2) # set to -0.49 for purple dataset
             # mu = -(sigmas[iter]**2)/4
             #################### FGM updates #####################
-            x_old = np.copy(x)
+            # x_old = np.copy(x)
             # do multiple realizations of LD and compute the average and std
-            x = z + (mu * grad_f) # for langevin dynamics: + np.sqrt(-2*mu)*np.random.randn(len(x))
-            tn_old = np.copy(tn)
-            tn = 1/2 * (1 + np.sqrt(1 + 4*(tn**2)))
-            z = x + ((tn_old - 1) / tn * (x - x_old)) # secondary sequence
+            # x = x_old + (mu * grad_f) # for langevin dynamics: + np.sqrt(-2*mu)*np.random.randn(len(x))
+            # tn_old = np.copy(tn)
+            # tn = 1/2 * (1 + np.sqrt(1 + 4*(tn**2)))
+            # z = x + ((tn_old - 1) / tn * (x - x_old)) # secondary sequence
             #################### OGM updates #####################
             # z_old = np.copy(z)
             # z = x + (mu * grad_f) # for langevin dynamics: + np.sqrt(-2*mu)*np.random.randn(len(x))
@@ -70,7 +70,7 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             # tn = 1/2 * (1 + np.sqrt(1 + 4*(tn**2)))
             # x = z + ((1 + tn_old / tn) / mu * grad_f) + ((tn_old - 1) / tn * (z - z_old))
             #################### gradient descent ###################
-            # x += (mu * grad_f) # gradient descent
+            x += (mu * grad_f) # gradient descent
             # set non-negatives to zero
             x[(x < 0)] = 0 
             Ax = A(holocat(x, ref))

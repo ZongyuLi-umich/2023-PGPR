@@ -55,8 +55,8 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
     for iter in range(niter):
         lsize = 128
         for t in range(T):
-            network_sigma = torch.from_numpy(np.array([sigmas[iter]])).float().cuda()
-            netinput_x = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().cuda()
+            network_sigma = torch.from_numpy(np.array([sigmas[iter]])).float().to(next(model.parameters()).device)
+            netinput_x = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().to(next(model.parameters()).device)
             scorepart_x = -model.forward(netinput_x, network_sigma).cpu().detach().numpy().reshape((lsize, lsize))/sigmas[iter]
             scorepart_x = scorepart_x.reshape(-1)
             #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05
@@ -77,7 +77,7 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
             Aw = A(holocat(w, ref))
             
             # compute score(w)
-            netinput_w = torch.from_numpy(np.reshape(w, (1,1,lsize,lsize))).float().cuda()
+            netinput_w = torch.from_numpy(np.reshape(w, (1,1,lsize,lsize))).float().to(next(model.parameters()).device)
             scorepart_w = -model.forward(netinput_w, network_sigma).cpu().detach().numpy().reshape((lsize, lsize))/sigmas[iter]
             scorepart_w = scorepart_w.reshape(-1)
             #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05

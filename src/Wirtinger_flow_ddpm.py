@@ -39,8 +39,8 @@ def Wirtinger_flow_score_ddpm(A, At, y, b, x0, ref, sigma, delta,
         lsize = 128
         if negone:
             x = x*2-1
-        netinput = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().cuda()
-        network_t = torch.from_numpy(np.array([t])).float().cuda()
+        netinput = torch.from_numpy(np.reshape(x, (1,1,lsize,lsize))).float().to(next(model.parameters()).device)
+        network_t = torch.from_numpy(np.array([t])).float().to(next(model.parameters()).device)
         epspart = model.forward(netinput, network_t).cpu().detach().numpy().reshape((lsize, lsize))
         epspart = epspart.reshape(-1)
         #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05

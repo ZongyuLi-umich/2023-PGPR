@@ -39,8 +39,8 @@ def run_config(config):
     gpu_ids = allconfig['settings']['gpu_ids']
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu_ids
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    
+    # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = "cpu"
     ##################################################
     # get model 
     ##################################################
@@ -84,7 +84,7 @@ def run_config(config):
              model_ddpm=model_ddpm, exp_to_do=args.exp_to_do, img_to_do=args.img_to_do)   
 
 if __name__ == "__main__":
-    directory  = '/home/lizongyu/PycharmProjects/2023-PGPR/src/config'
+    directory  = '/home/lizongyu/PycharmProjects/2023-PGPR/src/config_celebA'
     json_files = []
     for filename in os.listdir(directory):
         f = os.path.join(directory, filename)
@@ -95,12 +95,12 @@ if __name__ == "__main__":
     for i in range(len(json_files)):
         run_config(json_files[i])
         
-    # config1 = 'config-0.020-sigma-0.5.json'
+    # config1 = 'config-0.030.json'
     # config2 = 'config-0.020-sigma-0.75.json'
     # config3 = 'config-0.020-sigma-1.25.json'
     # config4 = 'config-0.020-sigma-1.5.json'
     # config = 'config-apg-w-0.030.json'
     # run_config(os.path.join(directory, config1))
     # run_config(os.path.join(directory, config2))
-    # run_config(os.path.join(directory, config))
+    # run_config(os.path.join(directory, config1))
     # run_config(os.path.join(directory, config4))

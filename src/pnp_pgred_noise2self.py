@@ -61,7 +61,7 @@ def pnp_pgred_noise2self(A, At, y, b, x0, ref, sigma, delta, niter,
 
 def pretrain(noisy, model, masker, niter, sn=128):
     noisy = np.clip(noisy, 0, 1)
-    noisy = torch.from_numpy(jreshape(noisy, sn, sn))[None, None, ...].to(torch.float32).cuda()
+    noisy = torch.from_numpy(jreshape(noisy, sn, sn))[None, None, ...].to(torch.float32).to(next(model.parameters()).device)
     model.train()
     optimizer = Adam(model.parameters(), lr=0.001)
     loss_function = MSELoss()
@@ -78,7 +78,7 @@ def pretrain(noisy, model, masker, niter, sn=128):
 def denoise(x_tmp, model, sn=128):
     with torch.no_grad():
         x_tmp = np.clip(x_tmp, 0, 1)
-        x_tmp = torch.from_numpy(jreshape(x_tmp, sn, sn))[None, None, ...].to(torch.float32).cuda()
+        x_tmp = torch.from_numpy(jreshape(x_tmp, sn, sn))[None, None, ...].to(torch.float32).to(next(model.parameters()).device)
         x_tmp = model(x_tmp)
         x_tmp = vec(x_tmp.cpu().numpy())
         x_tmp = np.clip(x_tmp, 0, 1)

@@ -52,7 +52,7 @@ def pnp_pgprox(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, mu = Non
 def denoise(x_tmp, model, scale, sn=128):
     with torch.no_grad():
         x_tmp = np.clip(x_tmp, 0, 1)
-        x_tmp = torch.from_numpy(jreshape(x_tmp, sn, sn))[None, None, ...].to(torch.float32).cuda()
+        x_tmp = torch.from_numpy(jreshape(x_tmp, sn, sn))[None, None, ...].to(torch.float32).to(next(model.parameters()).device)
         x_tmp = model(x_tmp * scale)/scale
         x_tmp = vec(x_tmp.cpu().numpy())
         x_tmp = np.clip(x_tmp, 0, 1)
