@@ -1,3 +1,3 @@
-# 2023-PGPR
-Poisson-Gaussian phase retrieval
-Code for training the score-based diffusion model: https://github.com/sundeco/neurips_paper
+# Code for Poisson-Gaussian Holographic Phase Retrieval for Score-based Image Prior
+Instructions of running the code (and data) will be released in a week.
+
