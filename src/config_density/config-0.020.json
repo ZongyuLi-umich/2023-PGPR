@@ -3,12 +3,12 @@
         "gpu_ids": "0"
     },
     "expargs":{
-        "savedir": "../result/density_small_test-scale-0.020",
+        "savedir": "../result/density_small_test-scale-0.020-pgscore-30iter",
         "datadir": "../data/density_small",
         "dataset_name": "density_small",
         "init": "Poisson",
         "img_to_do": [],
-        "exp_to_do": [], 
+        "exp_to_do": ["pois", "pois_score", "pg_score"], 
         "ncore": 10,
         "imgsize": 128,
         "scaleSYS": 0.020,
@@ -22,7 +22,7 @@
         "pgADMM_niter": 20,
         "pgPROX_niter": 20,
         "pgRED_niter": 20,
-        "pgSCORE_niter": 15,
+        "pgSCORE_niter": 30,
         "pgDDPM_niter": 25,
         "pgADMM_scale": 0.5,
         "pgPROX_scale": 0.5,

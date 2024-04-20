@@ -84,7 +84,7 @@ def run_config(config):
              model_ddpm=model_ddpm, exp_to_do=args.exp_to_do, img_to_do=args.img_to_do)   
 
 if __name__ == "__main__":
-    directory  = '/home/lizongyu/PycharmProjects/2023-PGPR/src/config_celebA'
+    directory  = '/media/myssd/PycharmProjects/2023-PGPR/src/config_purple_gau'
     json_files = []
     for filename in os.listdir(directory):
         f = os.path.join(directory, filename)
@@ -95,7 +95,29 @@ if __name__ == "__main__":
     for i in range(len(json_files)):
         run_config(json_files[i])
         
-    # config1 = 'config-0.030.json'
+    directory  = '/media/myssd/PycharmProjects/2023-PGPR/src/config_density_gau'
+    json_files = []
+    for filename in os.listdir(directory):
+        f = os.path.join(directory, filename)
+        # checking if it is a file
+        if os.path.isfile(f):
+            json_files.append(f)
+    
+    for i in range(len(json_files)):
+        run_config(json_files[i])
+    
+    directory  = '/media/myssd/PycharmProjects/2023-PGPR/src/config_celebA_gau'
+    json_files = []
+    for filename in os.listdir(directory):
+        f = os.path.join(directory, filename)
+        # checking if it is a file
+        if os.path.isfile(f):
+            json_files.append(f)
+    
+    for i in range(len(json_files)):
+        run_config(json_files[i])
+        
+    # config1 = 'config-0.020-gau.json'
     # config2 = 'config-0.020-sigma-0.75.json'
     # config3 = 'config-0.020-sigma-1.25.json'
     # config4 = 'config-0.020-sigma-1.5.json'

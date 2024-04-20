@@ -1,14 +1,16 @@
 # run_alg.py
 # return selected algorithm
-from Wirtinger_flow_huber_TV import *
-from Wirtinger_flow_pois_gau import *
-from Wirtinger_flow_score import *
-from pnp_pgadmm import *
-from pnp_pgprox import *
-from pnp_pgred import *
-from pnp_pgred_noise2self import *
-from Wirtinger_flow_ddpm import *
-from Wirtinger_flow_score_apg import *
+from Wirtinger_flow_huber_TV import Wintinger_flow_huber_TV
+from Wirtinger_flow_huber_TV_Gau_Amp import Wintinger_flow_huber_TV_Gau_Amp
+from Wirtinger_flow_pois_gau import Wintinger_flow_pois_gau
+from Wirtinger_flow_score import Wintinger_flow_score
+from pnp_pgadmm import pnp_pgadmm
+from pnp_pgprox import pnp_pgprox
+from pnp_pgred import pnp_pgred
+from pnp_pgred_noise2self import pnp_pgred_noise2self
+from Wirtinger_flow_ddpm import Wirtinger_flow_score_ddpm
+from Wirtinger_flow_score_apg import Wintinger_flow_score_apg
+from Gerchberg_Saxton import Gerchberg_Saxton
 
 
 def run_alg(alg, args, model_pnp = None, model_score=None, model_ddpm=None, 
@@ -25,6 +27,29 @@ def run_alg(alg, args, model_pnp = None, model_score=None, model_ddpm=None,
                                        sthow='lineser', 
                                        reg1=0, 
                                        reg2=0, 
+                                       xtrue=kwargs['xtrue'],
+                                       verbose = verbose)
+    elif alg == 'gau_amp':
+        xout, cout = Wintinger_flow_huber_TV_Gau_Amp(A=kwargs['A'], 
+                                       At=kwargs['At'], 
+                                       y=kwargs['y'], 
+                                       b=kwargs['b'], 
+                                       x0=kwargs['x0'], 
+                                       ref=kwargs['ref'], 
+                                       niter=args.gau_niter, 
+                                       sthow='lineser', 
+                                       reg1=0, 
+                                       reg2=0, 
+                                       xtrue=kwargs['xtrue'],
+                                       verbose = verbose)
+    elif alg == 'gs':
+        xout, cout = Gerchberg_Saxton(A=kwargs['A'], 
+                                       At=kwargs['At'], 
+                                       y=kwargs['y'], 
+                                       b=kwargs['b'], 
+                                       x0=kwargs['x0'], 
+                                       ref=kwargs['ref'], 
+                                       niter=args.gs_niter, 
                                        xtrue=kwargs['xtrue'],
                                        verbose = verbose)
     elif alg == 'pois':
@@ -187,7 +212,7 @@ def run_alg(alg, args, model_pnp = None, model_score=None, model_ddpm=None,
                                             ref=kwargs['ref'], 
                                             sigma=args.sigma, 
                                             delta=args.delta, 
-                                            niter=args.pgSCORE_niter, 
+                                            niter=args.apgSCORE_niter, 
                                             xtrue=kwargs['xtrue'], 
                                             model = model_score,
                                             gradhow = 'gau',
@@ -201,7 +226,7 @@ def run_alg(alg, args, model_pnp = None, model_score=None, model_ddpm=None,
                                             ref=kwargs['ref'], 
                                             sigma=args.sigma, 
                                             delta=args.delta, 
-                                            niter=args.pgSCORE_niter, 
+                                            niter=args.apgSCORE_niter, 
                                             xtrue=kwargs['xtrue'], 
                                             model = model_score,
                                             gradhow = 'pois',
@@ -215,7 +240,7 @@ def run_alg(alg, args, model_pnp = None, model_score=None, model_ddpm=None,
                                             ref=kwargs['ref'], 
                                             sigma=args.sigma, 
                                             delta=args.delta, 
-                                            niter=args.pgSCORE_niter, 
+                                            niter=args.apgSCORE_niter, 
                                             xtrue=kwargs['xtrue'], 
                                             model = model_score,
                                             gradhow = 'pg',

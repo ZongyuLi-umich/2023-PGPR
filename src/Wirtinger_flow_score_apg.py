@@ -1,16 +1,12 @@
 # Wirtinger_flow_score_apg.py
 import numpy as np
-from utils2 import *
+from utils2 import get_grad_pg, holocat, grad_gau, grad_pois, cost_gau, \
+                cost_pois, get_sigma2_gau
 from numpy.linalg import norm
 from tqdm import tqdm
 import torch
-from eval_metric import *
+from eval_metric import nrmse
 
-
-def grad_gau(v, yi, bi): return 4 * (abs2(v) + bi - yi) * v
-def grad_pois(v, yi, bi): return 2 * v * (1 - yi / (abs2(v) + bi))
-def cost_gau(v, yi, bi): return abs2(abs2(v)+bi-yi)
-def cost_pois(v, yi, bi): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
         
 def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta, 
                             niter, xtrue, model, gradhow = 'pois',
@@ -25,10 +21,11 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
     w = np.copy(x) # secondary sequence
     vv = np.copy(x) # secondary sequence
     
-    phi, grad_phi, fisher = get_grad(sigma, delta)
-
+    phi, grad_phi, fisher = get_grad_pg(sigma, delta)
+    get_sigma2_v = np.vectorize(get_sigma2_gau)
     Ax = A(holocat(x, ref))
-    
+    # sigma2 = np.sum(y) / sn
+    sigma2 = get_sigma2_v(Ax, b)*2
     lastnrmse = 1
     T = 2  # set T=2 for purple dataset
     gamma = 0.5
@@ -82,11 +79,12 @@ def Wintinger_flow_score_apg(A, At, y, b, x0, ref, sigma, delta,
             scorepart_w = scorepart_w.reshape(-1)
             #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05
             scorepart_w = np.squeeze(scorepart_w)
-            
-            grad_fw = np.real(At(grad_fun(Aw, y, b)))[:N] + 1*scorepart_w
+
+            grad_fw = np.real(At(grad_fun(Aw, y, b, sigma2)))[:N] + 1*scorepart_w
             z = w + (mu * grad_fw) # eqn.(11)
             # do multiple realizations of LD and compute the average and std
-            grad_fx = np.real(At(grad_fun(Ax, y, b)))[:N] + 1*scorepart_x
+            
+            grad_fx = np.real(At(grad_fun(Ax, y, b, sigma2)))[:N] + 1*scorepart_x
             vv = x + (mu * grad_fx) # eqn.(12) # for langevin dynamics: + np.sqrt(-2*mu)*np.random.randn(len(x))
             
             tn_old = np.copy(tn)

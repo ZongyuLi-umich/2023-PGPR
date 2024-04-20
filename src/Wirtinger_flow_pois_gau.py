@@ -1,9 +1,10 @@
 # Wirtinger_flow_huber_TV.py
 import numpy as np
-from utils2 import *
+from utils2 import get_grad_pg, huber, grad_huber, curv_huber, \
+                holocat, diff2d_forw, diff2d_adj
 from numpy.linalg import norm
 from tqdm import tqdm
-from eval_metric import *
+from eval_metric import nrmse
         
         
 def Wintinger_flow_pois_gau(A, At, y, b, x0, ref, sigma, delta, 
@@ -14,7 +15,7 @@ def Wintinger_flow_pois_gau(A, At, y, b, x0, ref, sigma, delta,
     sn = np.sqrt(N).astype(int)
     out.append(nrmse(x0, xtrue))
     x = np.copy(x0)
-    phi, grad_phi, fisher = get_grad(sigma, delta)
+    phi, grad_phi, fisher = get_grad_pg(sigma, delta)
     huber_v = np.vectorize(huber)
     grad_huber_v = np.vectorize(grad_huber)
     curv_huber_v = np.vectorize(curv_huber)

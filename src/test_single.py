@@ -111,7 +111,7 @@ def test_single(i, root_result_dir, dataset, args = {},
                 }
     
     for alg_name in exp_to_do:
-        if alg_name in ['gau', 'pois']:
+        if alg_name in ['gau', 'pois', 'gau_amp', 'gs']:
             run_wo_init(results_dir, alg_name, model_pnp, 
                         model_score, model_ddpm, args, kwargs)
         elif alg_name in ['pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 

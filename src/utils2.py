@@ -141,9 +141,9 @@ def holocat(x, ref):
     concated = np.hstack((x_reshaped, np.zeros_like(x_reshaped), ref_reshaped)) # holographic separation condition
     return vec(concated)
 
-def get_grad(sigma, delta):
+def get_grad_pg(sigma, delta):
     def phi(v, yi, bi): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
-    def grad_phi(v, yi, bi): 
+    def grad_phi(v, yi, bi, sigma2gau=None): 
         if yi < np.minimum(100, 100/(sigma**2)):
             u = abs2(v) + bi
             return 2 * v * grad_phi1(u, yi, sigma, delta)
@@ -151,6 +151,37 @@ def get_grad(sigma, delta):
             return 2 * v * (1 - yi / (abs2(v) + bi))
     def fisher(vi, bi): return 4 * abs2(vi) / (abs2(vi) + bi)
     return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
+
+def get_sigma2_gau(v, bi): return abs2(v) + bi
+
+
+def get_grad_gau_pois(gradhow):
+    if gradhow == 'gau':
+        def phi(v, yi, bi, sigma2): return abs2(abs2(v) + bi - yi) / (2 * sigma2)
+        def grad_phi(v, yi, bi, sigma2): return 4 * (abs2(v) + bi - yi) * v / (2 * sigma2)
+        def fisher(vi, bi, sigma2): return 16 * abs2(vi) * (abs2(vi) + bi) / (4 * sigma2**2)
+    elif gradhow == 'pois':
+        def phi(v, yi, bi, sigma2): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
+        def grad_phi(v, yi, bi, sigma2): return 2 * v * (1 - yi / (abs2(v) + bi))
+        def fisher(vi, bi, sigma2): return 4 * abs2(vi) / (abs2(vi) + bi)
+    else:
+        raise NotImplementedError
+    return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
+ 
+
+def get_sigma2_gau_amp(v, bi): return np.sqrt(abs2(v) + bi)
+
+def get_grad_gau_amp():
+    def phi(v, yi, sigma2): return abs2(np.abs(v) - yi) / (2 * sigma2)
+    def grad_phi(v, yi, sigma2): return 2 * (np.abs(v) - yi) * np.sign(v) / (2 * sigma2)
+    def fisher(vi, sigma2): return 4 * np.abs(vi) / (4 * sigma2**2)
+    return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
+
+def grad_gau(v, yi, bi, sigma2): return 4 * (abs2(v) + bi - yi) * v / (2 * sigma2)
+def grad_pois(v, yi, bi, sigma2 = None): return 2 * v * (1 - yi / (abs2(v) + bi))
+
+def cost_gau(v, yi, bi, sigma2): return abs2(abs2(v)+bi-yi) / (2 * sigma2)
+def cost_pois(v, yi, bi, sigma2 = None): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
 
 if __name__ == "__main__":
     # test fft

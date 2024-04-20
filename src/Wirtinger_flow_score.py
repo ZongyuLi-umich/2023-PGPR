@@ -1,14 +1,11 @@
 # Wirtinger_flow_huber_TV.py
 import numpy as np
-from utils2 import *
+from utils2 import get_grad_pg, holocat, grad_gau, grad_pois, get_sigma2_gau
 from numpy.linalg import norm
 from tqdm import tqdm
 import torch
-from eval_metric import *
+from eval_metric import nrmse
 
-
-def grad_gau(v, yi, bi): return 4 * (abs2(v) + bi - yi) * v
-def grad_pois(v, yi, bi): return 2 * v * (1 - yi / (abs2(v) + bi))
         
 def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta, 
                             niter, xtrue, model, gradhow = 'pois',
@@ -20,16 +17,20 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
     out.append(nrmse(x0, xtrue))
     x = np.copy(x0) # primary sequence
     z = np.copy(x) # secondary sequence
-    phi, grad_phi, fisher = get_grad(sigma, delta)
+    phi, grad_phi, fisher = get_grad_pg(sigma, delta)
 
     Ax = A(holocat(x, ref))
-
+    
     lastnrmse = 1
     T = 2  # set T=2 for purple dataset
     sigmas = np.geomspace(0.094, 0.0026, niter)
     tn = 1 # OGM
     grad_gau_v = np.vectorize(grad_gau)
     grad_pois_v = np.vectorize(grad_pois)
+    get_sigma2_v = np.vectorize(get_sigma2_gau)
+    # sigma2 = np.sum(y) / sn
+    sigma2 = get_sigma2_v(Ax, b)*2
+    
     # sigmas = np.geomspace(0.04, 0.0069, niter)
     for iter in range(niter):
         lsize = 128
@@ -41,8 +42,9 @@ def Wintinger_flow_score(A, At, y, b, x0, ref, sigma, delta,
             #scorepart = -model.forward(torch.from_numpy(x.reshape((lsize, lsize)))).cpu().detach().numpy()/0.05
             scorepart = np.squeeze(scorepart)
             #grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + reg1 * diff2d_adj(grad_huber_v(Tx, reg2), sn, sn)
+            
             if gradhow == 'gau':
-                grad_f = np.real(At(grad_gau_v(Ax, y, b)))[:N] + 1*scorepart
+                grad_f = np.real(At(grad_gau_v(Ax, y, b, sigma2)))[:N] + 1*scorepart
             elif gradhow == 'pois':
                 grad_f = np.real(At(grad_pois_v(Ax, y, b)))[:N] + 1*scorepart
             elif gradhow == 'pg':

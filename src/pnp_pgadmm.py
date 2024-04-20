@@ -2,11 +2,11 @@
 # plug and play ADMM method for Poisson+Gaussian Phase Retrieval
 from ast import AugLoad
 
-from utils2 import * 
+from utils2 import holocat, get_grad_pg, jreshape, vec
 import numpy as np
 from numpy.linalg import norm
 from tqdm import tqdm
-from eval_metric import *
+from eval_metric import nrmse
 import torch
 
 
@@ -23,7 +23,7 @@ def pnp_pgadmm(A, At, y, b, x0, ref, sigma, delta, niter, xtrue, model, rho, uit
     u = np.copy(x)
     Au = A(holocat(u, ref))
     eta = np.zeros(N)
-    _, grad_phi, fisher = get_grad(sigma, delta)
+    _, grad_phi, fisher = get_grad_pg(sigma, delta)
     
     lastnrmse = 1
     for iter in range(niter):

@@ -2,11 +2,11 @@
 # plug and play RED method for Poisson+Gaussian Phase Retrieval
 from ast import AugLoad
 import copy
-from utils2 import * 
+from utils2 import holocat, get_grad_pg, jreshape, vec
 import numpy as np
 from numpy.linalg import norm
 from tqdm import tqdm
-from eval_metric import *
+from eval_metric import nrmse
 import torch
 from noise2self import Masker
 from torch.nn import MSELoss, L1Loss
@@ -25,7 +25,7 @@ def pnp_pgred_noise2self(A, At, y, b, x0, ref, sigma, delta, niter,
     out.append(nrmse(x0, xtrue))
     x = np.copy(x0)
     Ax = A(holocat(x, ref))
-    _, grad_phi, fisher = get_grad(sigma, delta)
+    _, grad_phi, fisher = get_grad_pg(sigma, delta)
     print('Deep copy the pre-trained model and finetune it!')
     model_copy = copy.deepcopy(model)
     ########## pretrain on x0 ################

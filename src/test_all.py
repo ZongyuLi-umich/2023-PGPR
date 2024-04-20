@@ -30,11 +30,12 @@ def test_all(args = {}, model_pnp = None, model_score=None,
         img_to_do = range(len(dataset.data['xtrue']))
     
     if not exp_to_do:
-        exp_to_do = ['gau', 'pois', 'pg', 'pg_tv', 'pnp_pgadmm', 'pnp_pgprox', 
+        exp_to_do = ['gau', 'gau_amp', 'gs', 'pois', 'pg', 'pg_tv', 
+                     'pnp_pgadmm', 'pnp_pgprox', 
                      'pnp_pgred', 'pnp_pgred_noise2self', 
-                     'pois_score', 'pg_score',
-                     'pois_score_apg', 'pg_score_apg',
-                     'pois_ddpm', 'pg_ddpm']
+                     'gau_score', 'pois_score', 'pg_score',
+                     'gau_score_apg', 'pois_score_apg', 'pg_score_apg',
+                     'gau_ddpm', 'pois_ddpm', 'pg_ddpm']
     
     
     Parallel(n_jobs=args.ncore)(delayed(test_single)(i=i,

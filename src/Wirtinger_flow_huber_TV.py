@@ -1,23 +1,12 @@
 # Wirtinger_flow_huber_TV.py
 import numpy as np
-from utils2 import *
+from utils2 import get_sigma2_gau, get_grad_gau_pois, huber, grad_huber, curv_huber, \
+                    holocat, diff2d_forw, diff2d_adj
 from numpy.linalg import norm
-from eval_metric import *
+from eval_metric import nrmse
 from tqdm import tqdm
 
-def get_grad_gau_pois(gradhow):
-    if gradhow == 'gau':
-        def phi(v, yi, bi): return abs2(abs2(v) + bi - yi)
-        def grad_phi(v, yi, bi): return 4 * (abs2(v) + bi - yi) * v
-        def fisher(vi, bi): return 16 * abs2(vi) * (abs2(vi) + bi)
-    elif gradhow == 'pois':
-        def phi(v, yi, bi): return (abs2(v) + bi) - yi * np.log(abs2(v) + bi)
-        def grad_phi(v, yi, bi): return 2 * v * (1 - yi / (abs2(v) + bi))
-        def fisher(vi, bi): return 4 * abs2(vi) / (abs2(vi) + bi)
-    else:
-        raise NotImplementedError
-    return np.vectorize(phi), np.vectorize(grad_phi), np.vectorize(fisher)
-        
+       
 def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, reg2, xtrue, verbose = True):
     M = len(y)
     N = len(x0)
@@ -26,19 +15,24 @@ def Wintinger_flow_huber_TV(A, At, y, b, x0, ref, niter, gradhow, sthow, reg1, r
     out.append(nrmse(x0, xtrue))
     x = np.copy(x0)
     phi, grad_phi, fisher = get_grad_gau_pois(gradhow)
+    get_sigma2_v = np.vectorize(get_sigma2_gau)
     huber_v = np.vectorize(huber)
     grad_huber_v = np.vectorize(grad_huber)
     curv_huber_v = np.vectorize(curv_huber)
     Ax = A(holocat(x, ref))
+    # sigma2 = np.sum(y) / sn
+    sigma2 = get_sigma2_v(Ax, b)*2
+    # print('sigma2: ', sigma2)
     Tx = diff2d_forw(x, sn, sn)
-    def cost_fun(Ax, Tx): return np.sum(phi(Ax, y, b)) + reg1 * np.sum(huber_v(Tx, reg2))
+    def cost_fun(Ax, Tx): return np.sum(phi(Ax, y, b, sigma2)) + reg1 * np.sum(huber_v(Tx, reg2))
     lastnrmse = 1
     for iter in range(niter):
-        grad_f = np.real(At(grad_phi(Ax, y, b)))[:N] + reg1 * diff2d_adj(grad_huber_v(Tx, reg2), sn, sn)
+        
+        grad_f = np.real(At(grad_phi(Ax, y, b, sigma2)))[:N] + reg1 * diff2d_adj(grad_huber_v(Tx, reg2), sn, sn)
         Adk = A(holocat(grad_f, np.zeros_like(grad_f))) # K*L
         Tdk = diff2d_forw(grad_f, sn, sn)
         
-        D1 = np.sqrt(fisher(Ax, b))
+        D1 = np.sqrt(fisher(Ax, b, sigma2))
         D2 = np.sqrt(curv_huber_v(Tx, reg2))
         
         if sthow == 'fisher':

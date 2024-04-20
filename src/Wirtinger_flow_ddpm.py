@@ -1,15 +1,13 @@
 # Wirtinger_flow_ddpm.py
 import numpy as np
-from utils2 import *
+from utils2 import get_grad_pg, get_sigma2_gau, holocat, grad_gau, \
+                grad_pois
 from numpy.linalg import norm
 from tqdm import tqdm
 import torch
 import math
-from eval_metric import *
+from eval_metric import nrmse
 
-
-def grad_gau(v, yi, bi): return 4 * (abs2(v) + bi - yi) * v
-def grad_pois(v, yi, bi): return 2 * v * (1 - yi / (abs2(v) + bi))
         
 def Wirtinger_flow_score_ddpm(A, At, y, b, x0, ref, sigma, delta, 
                                 niter, xtrue, model, gradhow = 'pois',
@@ -20,9 +18,11 @@ def Wirtinger_flow_score_ddpm(A, At, y, b, x0, ref, sigma, delta,
     sn = np.sqrt(N).astype(int)
     out.append(nrmse(x0, xtrue))
     x = np.copy(x0)
-    phi, grad_phi, fisher = get_grad(sigma, delta)
-
+    phi, grad_phi, fisher = get_grad_pg(sigma, delta)
+    get_sigma2_v = np.vectorize(get_sigma2_gau)
     Ax = A(holocat(x, ref))
+    # sigma2 = np.sum(y) / sn
+    # sigma2 = 1e5
     lastnrmse = 1
     
     grad_gau_v = np.vectorize(grad_gau)
@@ -34,7 +34,8 @@ def Wirtinger_flow_score_ddpm(A, At, y, b, x0, ref, sigma, delta,
     alphabars = np.cumprod(alphas)
 
     negone = True
-
+    sigma2 = get_sigma2_v(Ax, b)*2
+    # sigma2 = np.sum(y) / sn
     for t in range(niter, 2, -1):
         lsize = 128
         if negone:
@@ -58,7 +59,7 @@ def Wirtinger_flow_score_ddpm(A, At, y, b, x0, ref, sigma, delta,
             x = (x+1)/2
         #x = x + (sigmas[iter-1]**2 - sigmas[iter]**2) * scorepart
         if gradhow == 'gau':
-            grad_f = np.real(At(grad_gau_v(Ax, y, b)))[:N] 
+            grad_f = np.real(At(grad_gau_v(Ax, y, b, sigma2)))[:N] 
         elif gradhow == 'pois':
             grad_f = np.real(At(grad_pois_v(Ax, y, b)))[:N] 
         elif gradhow == 'pg':
