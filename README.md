@@ -24,13 +24,12 @@ Run `pip -r install requirements.txt`.
 ```plaintext
 2023-PGPR/
 │
-├── config_purple/      # configuration files
-├── config_celebA/     
-├── config_density/
-│
 ├── src/                # Source code files
 │   ├── main.py         # Main application entry point
 │   ├── utils.py        # Helper functions
+│   ├── config_purple/  # configuration files
+│   ├── config_celebA/  
+│   ├── config_density/ 
 │   └── ......
 │            
 │
