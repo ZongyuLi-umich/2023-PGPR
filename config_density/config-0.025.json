@@ -1,0 +1,131 @@
+{
+    "settings": {
+        "gpu_ids": "0"
+    },
+    "expargs":{
+        "savedir": "../result/density_small_test-scale-0.025-pgscore-30iter",
+        "datadir": "../data/density_small",
+        "dataset_name": "density_small",
+        "init": "Poisson",
+        "img_to_do": [],
+        "exp_to_do": ["pois", "pois_score", "pg_score"], 
+        "ncore": 10,
+        "imgsize": 128,
+        "scaleSYS": 0.025,
+        "sigma": 1,
+        "delta": 5,
+        "regTV": 64,
+        "gau_niter": 50,
+        "pois_niter": 50,
+        "pg_niter": 50,
+        "pgTV_niter": 50,
+        "pgADMM_niter": 20,
+        "pgPROX_niter": 20,
+        "pgRED_niter": 20,
+        "pgSCORE_niter": 30,
+        "pgDDPM_niter": 25,
+        "pgADMM_scale": 0.5,
+        "pgPROX_scale": 0.5,
+        "pgRED_scale": 0.5,
+        "pgADMM_rho": 32,
+        "pgPROX_rho": 0.2,
+        "pgRED_rho": 100
+    },
+
+    "methods": {
+        "denoise": {
+            "natureimg": {
+                "dnn_name": "dncnn",
+                "sgm_name": "sgm15",
+                "model_path":{
+                    "sgm1":   "../pnpmodels/dncnn/natureimg_sgm1/2023-03-17-03-38-27/train/models/best_snr.pth",
+                    "sgm3":   "../pnpmodels/dncnn/natureimg_sgm3/2023-03-17-03-39-22/train/models/best_snr.pth",
+                    "sgm5":   "../pnpmodels/dncnn/natureimg_sgm5/2023-03-18-15-45-43/train/models/best_snr.pth",
+                    "sgm7":   "../pnpmodels/dncnn/natureimg_sgm7/2023-03-18-15-47-24/train/models/best_snr.pth",
+                    "sgm9":   "../pnpmodels/dncnn/natureimg_sgm9/2023-03-18-15-47-39/train/models/best_snr.pth",
+                    "sgm15":  "../pnpmodels/dncnn/natureimg_sgm15/2023-03-20-13-01-19/train/models/best_snr.pth"
+                }
+            },
+
+            "virusimg": {
+                "dnn_name": "dncnn",
+                "sgm_name": "sgm15",
+                "model_path":{
+                    "sgm9":   "../pnpmodels/dncnn/virusimg_sgm9/2023-03-21-01-14-33/train/models/best_snr.pth",
+                    "sgm11":   "../pnpmodels/dncnn/virusimg_sgm11/2023-03-21-01-13-50/train/models/best_snr.pth",
+                    "sgm13":   "../pnpmodels/dncnn/virusimg_sgm13/2023-03-21-01-12-36/train/models/best_snr.pth",
+                    "sgm15":   "../pnpmodels/dncnn/virusimg_sgm15/2023-03-21-01-11-46/train/models/best_snr.pth",
+
+                    "sgm9sn":"../pnpmodels/dncnn/virusimg_sgm9/2023-03-21-01-43-53_sn/train/models/best_snr.pth",
+                    "sgm11sn":"../pnpmodels/dncnn/virusimg_sgm11/2023-03-21-01-43-18_sn/train/models/best_snr.pth",
+                    "sgm13sn":"../pnpmodels/dncnn/virusimg_sgm13/2023-03-21-01-42-42_sn/train/models/best_snr.pth",
+                    "sgm15sn":"../pnpmodels/dncnn/virusimg_sgm15/2023-03-21-01-41-55_sn/train/models/best_snr.pth"
+                }
+            },
+
+            "celebA_small": {
+                "dnn_name": "dncnn",
+                "sgm_name": "sgm15",
+                "model_path":{
+                        "sgm15":   "../pnpmodels/dncnn/celebaimg_sgm15/2023-09-14-14-44-07/train/models/best_snr.pth"
+                        }
+            },
+            
+            "density_small": {
+                "dnn_name": "dncnn",
+                "sgm_name": "sgm15",
+                "model_path":{
+                        "sgm15":   "../pnpmodels/dncnn/densityimg_sgm15/2023-09-14-14-50-20/train/models/best_snr.pth"
+                        }
+            }
+        },
+
+        "ddpm":{
+            "virusimg": {
+                "model_path": "../ddpmmodels/virusimg/best_checkpoint.pytorch"
+            },
+            "celebA_small": {
+                "model_path": "../ddpmmodels/celebA_small/best_checkpoint.pytorch"
+            },
+            "density_small":{
+                "model_path": "../ddpmmodels/density_small/best_checkpoint.pytorch"
+            }
+        },
+
+        "score":{
+            "natureimg": {
+                "model_path": "../scoremodels/natureimg/best_checkpoint.pytorch"
+            },
+
+            "virusimg":{
+                "model_path": "../scoremodels/virusimg/best_checkpoint.pytorch"
+            },
+            "celebA_small": {
+                "model_path": "../scoremodels/celebA_small/best_checkpoint.pytorch"
+            },
+            "density_small":{
+                "model_path": "../scoremodels/density_small/best_checkpoint.pytorch"
+            }
+        }     
+    },
+
+    "networks": {
+        "dncnn": {
+            "dimension": 2,
+            "ic": 1,
+            "oc": 1,
+            "depth": 17,
+            "kernel_size": 3,
+            "features": 64,
+            "groups": 1,
+            "is_bn": true,
+            "is_sn": false,
+            "is_res": true
+        },
+        "unet":{
+            "dim": 128
+        }
+    }
+
+}
+
